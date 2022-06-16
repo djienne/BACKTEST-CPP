@@ -1,24 +1,3 @@
-*  ***Purpore : run fast and memory effective backtests on trading strategies*** (EMA crossover, supertrends, etc...).
-* Technical indicators are provided by TA-lib (Technical Analysis Library)
-* The provided strategies to-be-optimized are (so far):
-    * `backtest_double_EMA_float.cpp` : finds the two best EMA values for a basic 2-EMA cross-over strategy
-    * `backtest_double_EMA_StochRSI_float.cpp` : finds the two best EMA values for a 2-EMA cross-over strategy with Stochastic RSI check (buying if overbought, selling if oversold; was found to be better than the opposite)
-    * Other strategies should be added later
-* use it like a boiler plate code in order to test other strategies and/or parameter space.
-* data is provided in `data` for Binance top 30 coins, several timeframes. If other data is wanted, the user must update it manually and follow the same format: `unix-timestamp(ms);open;high;low;close;volume` (no header).
-* A python version of `backtest_double_EMA_StochRSI_float` is provided in the `python` folder for sanity check and performance comparison.
-
-**How to compile and run**
-*  Instructions for Linux/Ubuntu (if Windows, you can use Virtual Box that is free)
-*  Have a C/C++ compiler installed (recommended g++ and gcc)
-*  Compiling TA-lib (Technical Analysis Library):
-   *  open terminal in folder `talib` and run `./configure --prefix=/$(pwd)/talib_install/` then  `make`  then  `make install` and then  `make clean` 
-* open a terminal in the root folder (=${fileDirname}) (containing `backtest_*.cpp`), and run `make`
-* execute the backtest with `./backtest_double_EMA_float.exe` (or other `.exe` for other strategies) in the root folder
-* alternatively, run `sh install.sh` in the root folder.
-
-**Example results:** (2-EMA cross simple strategy)
-```
 -------------------------------------
 Strategy to test: 2-EMA crossover simple
 DATA FILE TO PROCESS: ./data/BTCUSDT_1HOUR.txt
@@ -79,4 +58,4 @@ Number of backtests performed : 39402
 Time taken                    : 11 seconds 
 RAM usage                     : 43.5 MB
 -------------------------------------
-```
+
