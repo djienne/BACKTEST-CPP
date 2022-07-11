@@ -26,7 +26,7 @@ const float STOCH_RSI_LOWER = 0.200;
 const float minimum_yearly_gain_pc = -100.0; // pc
 int i_start_year = 0;
 
-// RANGE OF EMA PERIDOS TO TEST
+// RANGE OF EMA PERIDOS TO TESTs
 const int period_max_EMA = 350;
 const int range_step = 1;
 std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);

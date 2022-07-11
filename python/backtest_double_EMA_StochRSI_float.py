@@ -3,6 +3,11 @@ import numpy as np
 import pandas_ta as ta
 import psutil
 import time
+import os
+
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 class RUN_RESULT():
     pass
@@ -25,10 +30,10 @@ i_start_year = 0
 # RANGE OF EMA PERIDOS TO TEST ####################################
 period_max_EMA = 350
 range_step = 1
-#range1 = np.arange(2, period_max_EMA, range_step)
-#range2 = np.arange(2, period_max_EMA, range_step)
-range1 = [116]
-range2 = [3]
+range1 = np.arange(2, period_max_EMA, range_step)
+range2 = np.arange(2, period_max_EMA, range_step)
+#range1 = [116]
+#range2 = [3]
 ###################################################################
 
 i_print = 0
@@ -115,6 +120,7 @@ def INITIALIZE_DATA(kline):
     kline['hour']  = kline['date'].dt.hour
     kline['month'] = kline['date'].dt.month
     kline['day']   = kline['date'].dt.day
+    kline['shifted_year']  = kline['year'].shift(-1)
 
     MIN_NUMBER_OF_TRADES = MIN_NUMBER_OF_TRADES_PER_YEAR * int(np.max(kline['year']) - np.min(kline['year']) + 1)
 
@@ -130,6 +136,7 @@ def PROCESS(kline, ema1_v, ema2_v):
     global range2
     global i_print
     global ii_begin
+    global FEE
 
     nb_tested += 1
 
@@ -157,21 +164,27 @@ def PROCESS(kline, ema1_v, ema2_v):
     total_fees_paid_USDT = 0.0
     WALLET_VAL_USDT = USDT_amount_initial
 
-    for ii in range(ii_begin,nb_max,1):
+    emastr1 = "EMA" + str(ema1_v)
+    emastr2 = "EMA" + str(ema2_v)
+
+    for ii, row in kline.iterrows():
+
+        if (ii<ii_begin):
+            continue
 
         if (ii == nb_max - 1):
             LAST_ITERATION = True
 
         # condition for open / close position
-        OPEN_LONG_CONDI  = kline["EMA" + str(ema2_v)].iloc[ii] >= kline["EMA" + str(ema1_v)].iloc[ii] and kline['StochRSI'].iloc[ii] > STOCH_RSI_UPPER
-        CLOSE_LONG_CONDI = kline["EMA" + str(ema2_v)].iloc[ii] <= kline["EMA" + str(ema1_v)].iloc[ii] and kline['StochRSI'].iloc[ii] < STOCH_RSI_LOWER
+        OPEN_LONG_CONDI  = row[emastr2] >= row[emastr1] and row['StochRSI'] > STOCH_RSI_UPPER
+        CLOSE_LONG_CONDI = row[emastr2] <= row[emastr1] and row['StochRSI'] < STOCH_RSI_LOWER
 
         # IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND THEN FOR OPENING POSITION
 
         # CLOSE LONG
         if (COIN_AMOUNT > 0.0 and (CLOSE_LONG_CONDI or LAST_ITERATION)):
 
-            USDT_amount = COIN_AMOUNT * kline['close'].iloc[ii]
+            USDT_amount = COIN_AMOUNT * row['close']
             COIN_AMOUNT = 0.0
 
             # apply FEEs
@@ -179,7 +192,7 @@ def PROCESS(kline, ema1_v, ema2_v):
             USDT_amount -= fe
             total_fees_paid_USDT += fe
             #
-            if (kline['close'].iloc[ii] >= price_position_open):
+            if (row['close'] >= price_position_open):
                 nb_profit += 1
             else:
                 nb_loss += 1
@@ -187,29 +200,30 @@ def PROCESS(kline, ema1_v, ema2_v):
         # OPEN LONG
         if (COIN_AMOUNT == 0.0 and OPEN_LONG_CONDI and LAST_ITERATION == False):
 
-            price_position_open = kline['close'].iloc[ii]
-            COIN_AMOUNT = USDT_amount / kline['close'].iloc[ii]
+            price_position_open = row['close']
+            COIN_AMOUNT = USDT_amount / row['close']
             USDT_amount = 0.0
 
             # apply FEEs
             fe = COIN_AMOUNT * FEE / 100.0
             COIN_AMOUNT -= fe
-            total_fees_paid_USDT += fe * kline['close'].iloc[ii]
+            total_fees_paid_USDT += fe * row['close']
             #
 
             NB_POSI_ENTERED += 1
 
         # check yealy gains
-        if (kline['year'].iloc[ii-1] != kline['year'].iloc[ii] or LAST_ITERATION):
-            result.years_yearly_gains.append(kline['year'].iloc[ii-1])
-            WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * kline['close'].iloc[ii]
+
+        if (row['shifted_year'] != row['year'] or LAST_ITERATION):
+            result.years_yearly_gains.append(row['year'])
+            WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * row['close']
             yg = (WALLET_VAL_USDT - WALLET_VAL_begin_year) / WALLET_VAL_begin_year * 100.0
             result.yearly_gains.append(np.round(yg * 100.0) / 100.0)
             WALLET_VAL_begin_year = WALLET_VAL_USDT
 
         # check wallet status
         if (CLOSE_LONG_CONDI or LAST_ITERATION):
-            WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * kline['close'].iloc[ii]
+            WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * row['close']
             if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT):
                 MAX_WALLET_VAL_USDT = WALLET_VAL_USDT
 
@@ -218,7 +232,7 @@ def PROCESS(kline, ema1_v, ema2_v):
             if (pc_change_with_max < max_drawdown):
                 max_drawdown = pc_change_with_max
 
-    WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * kline['close'].iloc[-1]
+    WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * row['close']
 
     gain = (WALLET_VAL_USDT - USDT_amount_initial) / USDT_amount_initial * 100.0
     WR = float(nb_profit) / float(NB_POSI_ENTERED) * 100.0
