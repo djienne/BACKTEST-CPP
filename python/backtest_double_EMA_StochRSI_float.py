@@ -41,7 +41,6 @@ ii_begin = 0
 nb_tested = 0
 
 ###################################################################
-
 def custom_stochRSI_TravingView_Style(close, length=14, rsi_length=14, k=3, d=3):
     # Results between 0 and 1
     """Indicator: Stochastic RSI Oscillator (STOCHRSI)
@@ -64,7 +63,6 @@ def custom_stochRSI_TravingView_Style(close, length=14, rsi_length=14, k=3, d=3)
     return (stochrsi/100.0).round(4), (stochrsi_k/100.0).round(4), (stochrsi_d/100.0).round(4)
 
 ###################################################################
-
 def print_res(res):
     print("-------------------------------------")
     print("EMA: ", res.ema1, " ", res.ema2)
@@ -75,7 +73,6 @@ def print_res(res):
     print("Score: ", res.score)
     print("Number of trades: ", res.nb_posi_entered)
 ###################################################################
-
 def print_best_res(best):
     print("\n-------------------------------------")
     print("BEST PARAMETER SET FOUND: ")
@@ -97,7 +94,6 @@ def print_best_res(best):
     print("-------------------------------------")
 
 ###################################################################
-
 def INITIALIZE_DATA(kline):
     global MIN_NUMBER_OF_TRADES
     global MIN_NUMBER_OF_TRADES_PER_YEAR
@@ -133,7 +129,6 @@ def INITIALIZE_DATA(kline):
     return kline2
 
 ###################################################################
-
 def PROCESS(kline, ema1_v, ema2_v):
     global nb_tested
     global range1
@@ -263,7 +258,6 @@ def PROCESS(kline, ema1_v, ema2_v):
     return result
 
 ###################################################################
-
 def read_input_data(input_file_path):
     kline = pd.read_csv(input_file_path, delimiter=';',header=None,names=['time','open','high','low','close','volume'])
     #print(kline.tail(4))
@@ -271,7 +265,6 @@ def read_input_data(input_file_path):
     return kline
 
 ###################################################################
-
 if __name__ == "__main__":
 
     t_begin = time.time()
@@ -319,8 +312,8 @@ if __name__ == "__main__":
                 best = res
 
     print_best_res(best)
-    t_end = time.time()
 
+    t_end = time.time()
     print("Number of backtests performed : ", nb_tested)
     print("Time taken                    : ", int(t_end - t_begin), " seconds ")
     ram_usage = psutil.virtual_memory().available * 100.0 / psutil.virtual_memory().total
