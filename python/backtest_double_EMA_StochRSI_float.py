@@ -119,7 +119,7 @@ def INITIALIZE_DATA(kline):
     kline2['hour']  = kline2['date'].dt.hour
     kline2['month'] = kline2['date'].dt.month
     kline2['day']   = kline2['date'].dt.day
-    kline2['shifted_year']  = kline2['year'].shift(-1)
+    kline2['shifted_year']  = kline2['year'].shift(1)
 
     MIN_NUMBER_OF_TRADES = MIN_NUMBER_OF_TRADES_PER_YEAR * int(np.max(kline2['year']) - np.min(kline2['year']) + 1)
 
