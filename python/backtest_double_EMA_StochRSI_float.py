@@ -50,13 +50,13 @@ def custom_stochRSI_TravingView_Style(close, length=14, rsi_length=14, k=3, d=3)
     if d<0:
         raise Exception("d cannot be negative")
     # Calculate Result
-    rsi_ = ta.rsi(close, length=rsi_length,talib=True)
+    rsi_ = ta.rsi(close, length=rsi_length,talib=False)
     lowest_rsi = rsi_.rolling(length).min()
     highest_rsi = rsi_.rolling(length).max()
     stochrsi = 100.0 * (rsi_ - lowest_rsi) / ta.non_zero_range(highest_rsi, lowest_rsi)
     if k>0:
-        stochrsi_k = ta.ma('sma', stochrsi, length=k ,talib=True)
-        stochrsi_d = ta.ma('sma', stochrsi_k, length=d ,talib=True)
+        stochrsi_k = ta.ma('sma', stochrsi, length=k ,talib=False)
+        stochrsi_d = ta.ma('sma', stochrsi_k, length=d ,talib=False)
     else:
         stochrsi_k = None
         stochrsi_d = None
