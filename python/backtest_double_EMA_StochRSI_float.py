@@ -114,7 +114,7 @@ def INITIALIZE_DATA(kline):
     for i in list_ema:
         kline2["EMA" + str(i)] = ta.ema(kline2["close"], length=int(i), talib=False)
     print("Calculated EMAs.")
-    
+
     kline2['StochRSI'], _, _ = custom_stochRSI_TravingView_Style(kline2["close"], length=14, rsi_length=14, k=3, d=3)
     print("Calculated STOCHRSI.")
 
@@ -196,7 +196,7 @@ def PROCESS(kline, ema1_v, ema2_v):
             fe = USDT_amount * FEE / 100.0
             USDT_amount -= fe
             total_fees_paid_USDT += fe
-            #
+            # count win / loss
             if (row['close'] >= price_position_open):
                 nb_profit += 1
             else:
@@ -214,11 +214,10 @@ def PROCESS(kline, ema1_v, ema2_v):
             COIN_AMOUNT -= fe
             total_fees_paid_USDT += fe * row['close']
             #
-
+            # count position openings
             NB_POSI_ENTERED += 1
 
         # check yealy gains
-
         if (row['shifted_year'] != row['year'] or LAST_ITERATION):
             result.years_yearly_gains.append(row['year'])
             WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * row['close']
@@ -237,6 +236,7 @@ def PROCESS(kline, ema1_v, ema2_v):
             if (pc_change_with_max < max_drawdown):
                 max_drawdown = pc_change_with_max
 
+    # final backtest numbers for this EMA set
     WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * kline['close'].iloc[-1]
 
     gain = (WALLET_VAL_USDT - USDT_amount_initial) / USDT_amount_initial * 100.0
@@ -245,7 +245,6 @@ def PROCESS(kline, ema1_v, ema2_v):
     score = gain / DDC * WR
 
     # i_print += 1
-
     # if (i_print == 1000):
     #     i_print = 0
     #     print("DONE: EMA: ", ema1_v, " and EMA: ", ema2_v)
