@@ -100,32 +100,37 @@ def print_best_res(best):
 
 def INITIALIZE_DATA(kline):
     global MIN_NUMBER_OF_TRADES
+    global MIN_NUMBER_OF_TRADES_PER_YEAR
     global ii_begin
+    global period_max_EMA
     list_ema = []
+
+    kline2=kline.copy()
 
     maxval = np.max([np.max(range1), np.max(range2)]) + 5
     for i in range(maxval):
         list_ema.append(i)
 
     for i in list_ema:
-        kline["EMA" + str(i)] = ta.ema(kline["close"], length=int(i), talib=False)
+        kline2["EMA" + str(i)] = ta.ema(kline2["close"], length=int(i), talib=False)
 
     print("Calculated EMAs.")
-    kline['StochRSI'], _, _ = custom_stochRSI_TravingView_Style(kline["close"], length=14, rsi_length=14, k=3, d=3)
+    kline2['StochRSI'], _, _ = custom_stochRSI_TravingView_Style(kline2["close"], length=14, rsi_length=14, k=3, d=3)
     print("Calculated STOCHRSI.")
 
-    kline['date'] = pd.to_datetime(kline['time'], unit='ms')
-    kline['year']  = kline['date'].dt.year
-    kline['hour']  = kline['date'].dt.hour
-    kline['month'] = kline['date'].dt.month
-    kline['day']   = kline['date'].dt.day
-    kline['shifted_year']  = kline['year'].shift(-1)
+    kline2['date'] = pd.to_datetime(kline2['time'], unit='ms')
+    kline2['year']  = kline2['date'].dt.year
+    kline2['hour']  = kline2['date'].dt.hour
+    kline2['month'] = kline2['date'].dt.month
+    kline2['day']   = kline2['date'].dt.day
+    kline2['shifted_year']  = kline2['year'].shift(-1)
 
-    MIN_NUMBER_OF_TRADES = MIN_NUMBER_OF_TRADES_PER_YEAR * int(np.max(kline['year']) - np.min(kline['year']) + 1)
+    MIN_NUMBER_OF_TRADES = MIN_NUMBER_OF_TRADES_PER_YEAR * int(np.max(kline2['year']) - np.min(kline2['year']) + 1)
 
     ii_begin = period_max_EMA + 2
 
     print("Initialized calculations.")
+    return kline2
 
 ###################################################################
 
@@ -136,6 +141,7 @@ def PROCESS(kline, ema1_v, ema2_v):
     global i_print
     global ii_begin
     global FEE
+    global USDT_amount_initial
 
     nb_tested += 1
 
@@ -261,7 +267,7 @@ def PROCESS(kline, ema1_v, ema2_v):
 
 def read_input_data(input_file_path):
     kline = pd.read_csv(input_file_path, delimiter=';',header=None,names=['time','open','high','low','close','volume'])
-    print(kline.tail(4))
+    #print(kline.tail(4))
     print("Loaded data file.")
     return kline
 
@@ -277,7 +283,7 @@ if __name__ == "__main__":
 
     kline = read_input_data(DATAFILE)
 
-    INITIALIZE_DATA(kline)
+    kline = INITIALIZE_DATA(kline)
 
     best = RUN_RESULT()
 
