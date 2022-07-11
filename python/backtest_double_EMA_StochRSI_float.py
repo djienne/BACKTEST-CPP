@@ -105,7 +105,7 @@ def INITIALIZE_DATA(kline):
     global period_max_EMA
     list_ema = []
 
-    kline2=kline.copy()
+    kline2 = kline.copy()
 
     maxval = np.max([np.max(range1), np.max(range2)]) + 5
     for i in range(maxval):
@@ -113,8 +113,8 @@ def INITIALIZE_DATA(kline):
 
     for i in list_ema:
         kline2["EMA" + str(i)] = ta.ema(kline2["close"], length=int(i), talib=False)
-
     print("Calculated EMAs.")
+    
     kline2['StochRSI'], _, _ = custom_stochRSI_TravingView_Style(kline2["close"], length=14, rsi_length=14, k=3, d=3)
     print("Calculated STOCHRSI.")
 
