@@ -43,6 +43,7 @@ nb_tested = 0
 ###################################################################
 
 def custom_stochRSI_TravingView_Style(close, length=14, rsi_length=14, k=3, d=3):
+    # Results between 0 and 1
     """Indicator: Stochastic RSI Oscillator (STOCHRSI)
     Should be similar to TradingView's calculation"""
     if k<0:
@@ -64,15 +65,15 @@ def custom_stochRSI_TravingView_Style(close, length=14, rsi_length=14, k=3, d=3)
 
 ###################################################################
 
-def print_res(best):
+def print_res(res):
     print("-------------------------------------")
-    print("EMA: ", best.ema1, " ", best.ema2)
-    print("Gain: ", best.gain_pc, "%")
-    print("Win rate: ", best.win_rate, "%")
-    print("max DD: ", best.max_DD, "%")
-    print("Gain over DDC: ", best.gain_over_DDC)
-    print("Score: ", best.score)
-    print("Number of trades: ", best.nb_posi_entered)
+    print("EMA: ", res.ema1, " ", res.ema2)
+    print("Gain: ", res.gain_pc, "%")
+    print("Win rate: ", res.win_rate, "%")
+    print("max DD: ", res.max_DD, "%")
+    print("Gain over DDC: ", res.gain_over_DDC)
+    print("Score: ", res.score)
+    print("Number of trades: ", res.nb_posi_entered)
 ###################################################################
 
 def print_best_res(best):
@@ -93,7 +94,6 @@ def print_best_res(best):
         print(best.years_yearly_gains[i], " :: ", best.yearly_gains[i], "%")
 
     print("Total fees paid: ", round(best.total_fees_paid*100.0)/100.0, "$ (started with 1000$)")
-
     print("-------------------------------------")
 
 ###################################################################
@@ -115,7 +115,6 @@ def INITIALIZE_DATA(kline):
     print("Calculated STOCHRSI.")
 
     kline['date'] = pd.to_datetime(kline['time'], unit='ms')
-
     kline['year']  = kline['date'].dt.year
     kline['hour']  = kline['date'].dt.hour
     kline['month'] = kline['date'].dt.month
@@ -198,7 +197,7 @@ def PROCESS(kline, ema1_v, ema2_v):
                 nb_loss += 1
 
         # OPEN LONG
-        if (COIN_AMOUNT == 0.0 and OPEN_LONG_CONDI and LAST_ITERATION == False):
+        if (COIN_AMOUNT == 0.0 and OPEN_LONG_CONDI and not LAST_ITERATION):
 
             price_position_open = row['close']
             COIN_AMOUNT = USDT_amount / row['close']
@@ -232,18 +231,18 @@ def PROCESS(kline, ema1_v, ema2_v):
             if (pc_change_with_max < max_drawdown):
                 max_drawdown = pc_change_with_max
 
-    WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * row['close']
+    WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * kline['close'].iloc[-1]
 
     gain = (WALLET_VAL_USDT - USDT_amount_initial) / USDT_amount_initial * 100.0
     WR = float(nb_profit) / float(NB_POSI_ENTERED) * 100.0
     DDC = (1.0 / (1.0 + max_drawdown / 100.0) - 1.0) * 100.0
     score = gain / DDC * WR
 
-    i_print += 1
+    # i_print += 1
 
-    if (i_print == 1000):
-        i_print = 0
-        print("DONE: EMA: ", ema1_v, " and EMA: ", ema2_v)
+    # if (i_print == 1000):
+    #     i_print = 0
+    #     print("DONE: EMA: ", ema1_v, " and EMA: ", ema2_v)
 
     result.WALLET_VAL_USDT = USDT_amount
     result.gain_over_DDC = gain / DDC
