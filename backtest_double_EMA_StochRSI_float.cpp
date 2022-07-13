@@ -11,11 +11,11 @@
 #include <ta-lib/ta_libc.h>
 using namespace std;
 
-const std::string DATAFILE = "./data/Binance/4h/BTC-USDT.csv";
+const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
 const std::string STRAT_NAME = "2-EMA crossover with Stoch RSI";
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
-const float FEE = 0.07;        // FEES in %
+const float FEE = 0.05;        // FEES in %
 const float USDT_amount_initial = 1000.0;
 const int MIN_NUMBER_OF_TRADES_PER_YEAR = 14; // minimum number of trades required (to avoid some noise / lucky circunstances)
 int MIN_NUMBER_OF_TRADES = -1;                // minimum number of trades required (to avoid some noise / lucky circunstances)

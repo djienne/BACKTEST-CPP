@@ -23,12 +23,12 @@ const bool CAN_SHORT = false;                 // SHORT ON OR OFF
 const int MIN_NUMBER_OF_TRADES = 80;          // minimum number of trades required (to avoid some noise / lucky circunstances)
 const float MIN_ALLOWED_MAX_DRAWBACK = -50.0; // %
 const float MAX_ALLOWED_DAYS_BETWEEN_PORTFOLIO_ATH = 365;
-const std::string DATAFILE = "./data/Binance/4h/BTC-USDT.csv";
+const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
 const float time_frame_in_hours = 1.0;
 
 // RANGE OF EMA PERIDOS TO TEST
-const int period_max_EMA = std::max(200, int(200. / time_frame_in_hours / 1.5)); // at least 200
-const int range_step = std::max(1, int(1. / time_frame_in_hours / 4.0));         // at least 1
+const int period_max_EMA = 400;
+const int range_step = 1;   
 std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);
 std::vector<int> range2 = integer_range(2, period_max_EMA, range_step);
 //////////////////////////
@@ -82,7 +82,7 @@ void INITIALIZE_DATA(const KLINEf &kline)
 {
     std::vector<int> list_ema = {};
 
-    for (uint i = 1; i <= std::max(find_max(range1), find_max(range2)) + 5; i++)
+    for (uint i = 2; i <= std::max(find_max(range1), find_max(range2)) + 5; i++)
     {
         list_ema.push_back(i);
     }
