@@ -11,7 +11,7 @@
 #include <ta-lib/ta_libc.h>
 using namespace std;
 
-const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
+const std::string DATAFILE = "./data/Binance/30m/BTC-USDT.csv";
 const std::string STRAT_NAME = "2-EMA crossover with Stoch RSI";
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
