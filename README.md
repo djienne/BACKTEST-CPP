@@ -80,15 +80,23 @@ Time taken                    : 11 seconds
 RAM usage                     : 43.5 MB
 -------------------------------------
 ```
-*** Performance comparison (naive) Python VS C++ ***
+
+Performance comparison (naive) Python versus C++ :
+
 ```
 C++ : backtest_double_EMA_StochRSI_float.exe
 -------------------------------------
-Number of backtests performed : 119370
-Time taken                    : 8 seconds 
-RAM usage                     : 29.9 MB
+Number of backtests performed : 9120
+Time taken                    : 2 seconds 
+RAM usage                     : 14.3 MB
 -------------------------------------
 
 Python : backtest_double_EMA_StochRSI_float.py
+-------------------------------------
+Number of backtests performed :  9120
+Time taken                    :  5955  seconds 
+RAM usage                     :  86.0  MB
+-------------------------------------
 
+The C++ code is ~3000 faster than the (naive) python.
 ```
