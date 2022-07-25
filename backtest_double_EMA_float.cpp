@@ -27,7 +27,7 @@ const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
 const float time_frame_in_hours = 1.0;
 
 // RANGE OF EMA PERIDOS TO TEST
-const int period_max_EMA = 400;
+const int period_max_EMA = 600;
 const int range_step = 1;   
 std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);
 std::vector<int> range2 = integer_range(2, period_max_EMA, range_step);

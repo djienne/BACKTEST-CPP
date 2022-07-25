@@ -183,6 +183,43 @@ std::vector<float> TALIB_EMA(std::vector<float> vals, const int period)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<float> TALIB_SMA(std::vector<float> vals, const int period)
+{
+    std::vector<float> OUT;
+
+    TA_Integer outBeg;
+    TA_Integer outNbElement;
+    TA_RetCode retCode;
+    TA_Real out_val[vals.size()];
+
+    int min_idx = 0;
+    int max_idx = vals.size() - 1;
+
+    retCode = TA_S_SMA(min_idx, max_idx,
+                       &vals[0],
+                       period,
+                       &outBeg,
+                       &outNbElement,
+                       &out_val[0]);
+    
+    for (uint ii = 0; ii < outBeg; ii++)
+    {
+        OUT.push_back(0.0);
+    }
+
+    for (uint ii = 0; ii < outNbElement; ii++)
+    {
+        OUT.push_back(out_val[ii]);
+    }
+
+    if (OUT.size()!=vals.size()) abort();
+
+    return OUT;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, const int nb_period_stoch, const int nb_period_rsi)
 {
     std::vector<float> stochrsi{};
@@ -207,3 +244,46 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, co
 
     return stochrsi;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<float> TALIB_TRIX(std::vector<float> vals, const int trixLength, const int trixSignal)
+{
+    std::vector<float> TRIX;
+    std::vector<float> TRIX_PCT;
+    std::vector<float> TRIX_SIGNAL;
+    std::vector<float> TRIX_HISTO;
+
+    TRIX = TALIB_EMA(vals, trixLength);
+    TRIX = TALIB_EMA(TRIX, trixLength);
+    TRIX = TALIB_EMA(TRIX, trixLength);
+
+    TRIX_PCT.reserve(vals.size());
+    TRIX_HISTO.reserve(vals.size());
+
+    TRIX_PCT.push_back(0.0);
+    for (uint i = 1; i < TRIX.size(); i++)
+    {
+        float val =(TRIX[i]-TRIX[i-1])/TRIX[i-1]*100.0;
+        if (std::isinf(val) | std::isnan(val)) {
+            val=0.0;
+        }
+        TRIX_PCT.push_back(val);
+    }
+
+    if (TRIX_PCT.size()!=TRIX.size()) 
+    {   
+        std::cout << "ERROR TRIX_PCT.size()!=TRIX.size()" << std::endl;
+        std::abort();
+    }
+
+    TRIX_SIGNAL = TALIB_SMA(TRIX_PCT, trixSignal);
+    
+    for (uint i = 0; i < TRIX_PCT.size(); i++)
+    {
+        TRIX_HISTO.push_back(TRIX_PCT[i]-TRIX_SIGNAL[i]);
+    }
+
+    return TRIX_HISTO;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

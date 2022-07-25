@@ -11,11 +11,11 @@
 #include <ta-lib/ta_libc.h>
 using namespace std;
 
-const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
-const std::string STRAT_NAME = "2-EMA crossover with Stoch RSI";
+const std::string DATAFILE = "./data/Binance/1h/BTC-USDT.csv";
+const std::string STRAT_NAME = "TRIX";
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
-const float FEE = 0.05;        // FEES in %
+const float FEE = 0.07;        // FEES in %
 const float USDT_amount_initial = 1000.0;
 const int MIN_NUMBER_OF_TRADES_PER_YEAR = 14; // minimum number of trades required (to avoid some noise / lucky circunstances)
 int MIN_NUMBER_OF_TRADES = -1;                // minimum number of trades required (to avoid some noise / lucky circunstances)
@@ -27,15 +27,18 @@ const float minimum_yearly_gain_pc = -100.0; // pc
 int i_start_year = 0;
 
 // RANGE OF EMA PERIDOS TO TESTs
-const int period_max_EMA = 600;
-const int range_step = 1;
-std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);
-std::vector<int> range2 = integer_range(2, period_max_EMA, range_step);
+const int period_max_EMA = 400;
+// const int range_step = 2;
+//std::vector<int> range_EMA = {200};
+std::vector<int> range_EMA = integer_range(40, period_max_EMA, 2);
+std::vector<int> range_trixLength = integer_range(5, 100, 1);
+std::vector<int> range_trixSignal = integer_range(2, 100, 1);
 //////////////////////////
 
 uint i_print = 0;
 
 std::unordered_map<std::string, std::vector<float>> EMA_LISTS{};
+std::unordered_map<std::string, std::vector<float>> TRIX_LISTS{};
 std::vector<float> StochRSI{};
 std::vector<float> year{};
 std::vector<float> hour{};
@@ -64,7 +67,7 @@ void print_best_res(const RUN_RESULTf best)
     std::cout << "BEST PARAMETER SET FOUND: " << std::endl;
     std::cout << "-------------------------------------" << std::endl;
     std::cout << "Strategy : " << STRAT_NAME << std::endl;
-    std::cout << "EMAs     : " << best.ema1 << " " << best.ema2 << std::endl;
+    std::cout << "EMA TRIX_L TRIX_S     : " << best.ema1 << " " << best.trixLength << " " << best.trixSignal << std::endl;
     std::cout << "Best Gain: " << best.gain_pc << "%" << std::endl;
     std::cout << "Porfolio : " << best.WALLET_VAL_USDT << "$ (started with 1000$)" << std::endl;
     std::cout << "Win rate : " << best.win_rate << "%" << std::endl;
@@ -78,7 +81,7 @@ void print_best_res(const RUN_RESULTf best)
     {
         std::cout << best.years_yearly_gains[i] << " :: " << best.yearly_gains[i] << "%" << std::endl;
     }
-    std::cout << "Total fees paid: " << round(best.total_fees_paid*100.0)/100.0 << "$ (started with 1000$)" << std::endl;
+    std::cout << "Total fees paid: " << round(best.total_fees_paid * 100.0) / 100.0 << "$ (started with 1000$)" << std::endl;
 
     std::cout << "-------------------------------------" << std::endl;
 }
@@ -88,19 +91,24 @@ void INITIALIZE_DATA(const KLINEf &kline)
 {
     std::vector<int> list_ema = {};
 
-    for (uint i = 2; i <= std::max(find_max(range1), find_max(range2)) + 5; i++)
-    {
-        list_ema.push_back(i);
-    }
-
-    for (const uint i : list_ema)
+    for (const uint i : range_EMA)
     {
         EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.d_close, i);
     }
     cout << "Calculated EMAs." << endl;
-    //StochRSI = TALIB_STOCHRSI_K(kline.d_close,14,3,3);
+    // StochRSI = TALIB_STOCHRSI_K(kline.d_close,14,3,3);
     StochRSI = TALIB_STOCHRSI_not_averaged(kline.d_close, 14, 14);
     cout << "Calculated STOCHRSI." << endl;
+
+    // for (const uint i : range_trixLength)
+    // {
+    //     for (const uint j : range_trixSignal)
+    //     {
+    //         TRIX_LISTS["TRIX_HISTO_" + std::to_string(i) + "_" + std::to_string(j)] = TALIB_TRIX(kline.d_close, i, j);
+    //     }
+    // }
+
+    cout << "Calculated TRIX_HISTO." << endl;
 
     float yy_b = 1990;
     for (uint ii = 0; ii < kline.nb; ii++)
@@ -125,7 +133,7 @@ void INITIALIZE_DATA(const KLINEf &kline)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
+RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema_v, const int trixLength_v, const int trixSignal_v)
 {
     nb_tested++;
 
@@ -133,8 +141,8 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
 
     std::vector<float> close = KLINEf.d_close;
     std::vector<int> timestamp = KLINEf.d_time;
-    std::vector<float> EMA1 = EMA_LISTS["EMA" + std::to_string(ema1_v)];
-    std::vector<float> EMA2 = EMA_LISTS["EMA" + std::to_string(ema2_v)];
+    std::vector<float> EMA = EMA_LISTS["EMA" + std::to_string(ema_v)];
+    std::vector<float> TRIX_HISTO = TALIB_TRIX(close, trixLength_v, trixSignal_v);
 
     const int nb_max = KLINEf.nb;
 
@@ -158,16 +166,17 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
 
     for (uint ii = ii_begin; ii < nb_max; ii++)
     {
-        if (ii == nb_max - 1) LAST_ITERATION = true;
+        if (ii == nb_max - 1)
+            LAST_ITERATION = true;
 
         // condition for open / close position
-        OPEN_LONG_CONDI = EMA2[ii] >= EMA1[ii] && StochRSI[ii] > STOCH_RSI_UPPER;
-        CLOSE_LONG_CONDI = EMA2[ii] <= EMA1[ii] && StochRSI[ii] < STOCH_RSI_LOWER;
+        OPEN_LONG_CONDI = close[ii] > EMA[ii] && TRIX_HISTO[ii] > 0.0 && StochRSI[ii] < STOCH_RSI_UPPER;
+        CLOSE_LONG_CONDI = TRIX_HISTO[ii] < 0.0 && StochRSI[ii] > STOCH_RSI_LOWER;
 
         // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND THEN FOR OPENING POSITION
 
         // CLOSE LONG
-        if (COIN_AMOUNT>0.0 && (CLOSE_LONG_CONDI || LAST_ITERATION))
+        if (COIN_AMOUNT > 0.0 && (CLOSE_LONG_CONDI || LAST_ITERATION))
         {
             USDT_amount = COIN_AMOUNT * close[ii];
             COIN_AMOUNT = 0.0;
@@ -188,7 +197,7 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
         }
 
         // OPEN LONG
-        if (COIN_AMOUNT==0.0 && OPEN_LONG_CONDI && LAST_ITERATION==false)
+        if (COIN_AMOUNT == 0.0 && OPEN_LONG_CONDI && LAST_ITERATION == false)
         {
             price_position_open = close[ii];
 
@@ -215,21 +224,24 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
         }
 
         // check wallet status
-        if (CLOSE_LONG_CONDI || LAST_ITERATION) {
+        if (CLOSE_LONG_CONDI || LAST_ITERATION)
+        {
             WALLET_VAL_USDT = USDT_amount + COIN_AMOUNT * close[ii];
-            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT) MAX_WALLET_VAL_USDT = WALLET_VAL_USDT;
+            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT)
+                MAX_WALLET_VAL_USDT = WALLET_VAL_USDT;
             pc_change_with_max = (WALLET_VAL_USDT - MAX_WALLET_VAL_USDT) / MAX_WALLET_VAL_USDT * 100.0;
-            if (pc_change_with_max < max_drawdown) max_drawdown = pc_change_with_max;
-        
+            if (pc_change_with_max < max_drawdown)
+                max_drawdown = pc_change_with_max;
+
             if (t_new_ATH != 0)
+            {
+                delta_t_new_ATH = timestamp[ii] - t_new_ATH;
+                if (delta_t_new_ATH > max_delta_t_new_ATH)
                 {
-                    delta_t_new_ATH = timestamp[ii] - t_new_ATH;
-                    if (delta_t_new_ATH > max_delta_t_new_ATH)
-                    {
-                        max_delta_t_new_ATH = delta_t_new_ATH;
-                    }
+                    max_delta_t_new_ATH = delta_t_new_ATH;
                 }
-                t_new_ATH = timestamp[ii];
+            }
+            t_new_ATH = timestamp[ii];
         }
     }
 
@@ -244,7 +256,7 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
     if (i_print == 30000)
     {
         i_print = 0;
-        std::cout << "DONE: EMA: " << ema1_v << " and EMA: " << ema2_v << endl;
+        std::cout << "DONE: EMA: " << ema_v << " and trixLength: " << trixLength_v << " and trixSignal: " << trixSignal_v << endl;
     }
 
     result.WALLET_VAL_USDT = USDT_amount;
@@ -254,8 +266,9 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
     result.nb_posi_entered = NB_POSI_ENTERED;
     result.win_rate = WR;
     result.score = score;
-    result.ema1 = ema1_v;
-    result.ema2 = ema2_v;
+    result.ema1 = ema_v;
+    result.trixLength = trixLength_v;
+    result.trixSignal = trixSignal_v;
     result.total_fees_paid = total_fees_paid_USDT;
     result.max_delta_t_new_ATH = max_delta_t_new_ATH;
 
@@ -309,19 +322,6 @@ KLINEf read_input_data(const std::string &input_file_path)
 
 int main()
 {
-    // std::cout << range_step << std::endl;
-    // std::cout << period_max_EMA << std::endl; 
-    // std::vector<float> test{1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,5.,4.,3.,2.,1.};
-    // std::vector<float> EMA = TALIB_EMA(test,14);
-    // std::vector<float> RSI = TALIB_RSI(test,14);
-    // std::vector<float> MIN = TALIB_MIN(test,14);
-    // std::cout << MIN.size() << std::endl;
-    // for (uint i = 0; i < RSI.size(); i++)
-    // {
-    //     cout << RSI[i] << endl;
-    // }
-    // std::abort();   
-
     double t_begin = get_wall_time();
     std::cout << "\n-------------------------------------" << std::endl;
     std::cout << "Strategy to test: " << STRAT_NAME << std::endl;
@@ -331,8 +331,7 @@ int main()
     retCode = TA_Initialize();
     if (retCode != TA_SUCCESS)
     {
-        std::cout << "Cannot initialize TA-Lib !\n"
-                  << retCode << "\n";
+        std::cout << "Cannot initialize TA-Lib !\n" << retCode << "\n";
     }
     else
     {
@@ -356,27 +355,27 @@ int main()
     std::cout << "Maximum drawback (=drawdown) allowed : " << MIN_ALLOWED_MAX_DRAWBACK << " %" << std::endl;
     std::cout << "StochRSI Upper Band   : " << STOCH_RSI_UPPER << std::endl;
     std::cout << "StochRSI Lower Band   : " << STOCH_RSI_LOWER << std::endl;
-    std::cout << "EMA period max tested : " << period_max_EMA << std::endl;
-    std::cout << "EMA range step        : " << range_step << std::endl;
+    std::cout << "EMA period max tested : " << find_max(range_EMA) << std::endl;
+    std::cout << "trixLength max tested : " << find_max(range_trixLength) << std::endl;
+    std::cout << "trixSignal max tested : " << find_max(range_trixSignal) << std::endl;
     std::cout << "-------------------------------------" << std::endl;
 
     // MAIN LOOP
 
-    for (int ema1 : range1)
+    for (int ema : range_EMA)
     {
-        for (int ema2 : range2)
+        for (int trixL : range_trixLength)
         {
-            if (std::abs(ema1-ema2)<3) continue;
-
-            RUN_RESULTf res = PROCESS(kline, ema1, ema2);
-
-            if (res.gain_over_DDC > best.gain_over_DDC 
-                && res.gain_pc < 100000.0 
-                && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES // should do at least 100 trades
-                && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK 
-                && find_min(res.yearly_gains) > minimum_yearly_gain_pc)
+            for (int trixS : range_trixSignal)
             {
-                best = res;
+
+                RUN_RESULTf res = PROCESS(kline, ema, trixL, trixS);
+
+                if (res.gain_over_DDC > best.gain_over_DDC && res.gain_pc < 100000.0 && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES
+                    && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK && find_min(res.yearly_gains) > minimum_yearly_gain_pc)
+                {
+                    best = res;
+                }
             }
         }
     }
