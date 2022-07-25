@@ -1,0 +1,102 @@
+
+-------------------------------------
+Strategy to test: TRIX
+DATA FILES TO PROCESS: 
+./data/Binance/1h/BTC-USDT.csv
+./data/Binance/1h/ETH-USDT.csv
+./data/Binance/1h/BNB-USDT.csv
+./data/Binance/1h/XRP-USDT.csv
+Initialized TA-Lib !
+Loaded data file.
+Loaded data file.
+Loaded data file.
+Loaded data file.
+Start for ETH : 0
+Start for BNB : 1937
+Start for XRP : 6204
+BTC
+Calculated RSI.
+Calculated STOCHRSI.
+Calculated EMAs.
+ETH
+Calculated RSI.
+Calculated STOCHRSI.
+Calculated EMAs.
+BNB
+Calculated RSI.
+Calculated STOCHRSI.
+Calculated EMAs.
+XRP
+Calculated RSI.
+Calculated STOCHRSI.
+Calculated EMAs.
+Initialized calculations.
+Begin day      : 2017/8/17
+End day        : 2022/7/25
+OPEN/CLOSE FEE : 0.07 %
+Minimum number of trades required    : -1
+Maximum drawback (=drawdown) allowed : -50 %
+StochRSI Upper Band   : 0.8
+StochRSI Lower Band   : 0.2
+EMA period tested : 180
+-------------------------------------
+DONE: EMA: 180 and trixLength: 6 and trixSignal: 19
+DONE: EMA: 180 and trixLength: 7 and trixSignal: 29
+DONE: EMA: 180 and trixLength: 8 and trixSignal: 39
+DONE: EMA: 180 and trixLength: 9 and trixSignal: 49
+DONE: EMA: 180 and trixLength: 10 and trixSignal: 59
+DONE: EMA: 180 and trixLength: 11 and trixSignal: 69
+DONE: EMA: 180 and trixLength: 12 and trixSignal: 79
+DONE: EMA: 180 and trixLength: 13 and trixSignal: 89
+DONE: EMA: 180 and trixLength: 14 and trixSignal: 99
+DONE: EMA: 180 and trixLength: 16 and trixSignal: 19
+DONE: EMA: 180 and trixLength: 17 and trixSignal: 29
+DONE: EMA: 180 and trixLength: 18 and trixSignal: 39
+DONE: EMA: 180 and trixLength: 19 and trixSignal: 49
+DONE: EMA: 180 and trixLength: 20 and trixSignal: 59
+DONE: EMA: 180 and trixLength: 21 and trixSignal: 69
+DONE: EMA: 180 and trixLength: 22 and trixSignal: 79
+DONE: EMA: 180 and trixLength: 23 and trixSignal: 89
+DONE: EMA: 180 and trixLength: 24 and trixSignal: 99
+DONE: EMA: 180 and trixLength: 26 and trixSignal: 19
+DONE: EMA: 180 and trixLength: 27 and trixSignal: 29
+DONE: EMA: 180 and trixLength: 28 and trixSignal: 39
+DONE: EMA: 180 and trixLength: 29 and trixSignal: 49
+DONE: EMA: 180 and trixLength: 30 and trixSignal: 59
+DONE: EMA: 180 and trixLength: 31 and trixSignal: 69
+DONE: EMA: 180 and trixLength: 32 and trixSignal: 79
+DONE: EMA: 180 and trixLength: 33 and trixSignal: 89
+DONE: EMA: 180 and trixLength: 34 and trixSignal: 99
+DONE: EMA: 180 and trixLength: 36 and trixSignal: 19
+DONE: EMA: 180 and trixLength: 37 and trixSignal: 29
+DONE: EMA: 180 and trixLength: 38 and trixSignal: 39
+DONE: EMA: 180 and trixLength: 39 and trixSignal: 49
+DONE: EMA: 180 and trixLength: 40 and trixSignal: 59
+DONE: EMA: 180 and trixLength: 41 and trixSignal: 69
+DONE: EMA: 180 and trixLength: 42 and trixSignal: 79
+DONE: EMA: 180 and trixLength: 43 and trixSignal: 89
+DONE: EMA: 180 and trixLength: 44 and trixSignal: 99
+DONE: EMA: 180 and trixLength: 46 and trixSignal: 19
+DONE: EMA: 180 and trixLength: 47 and trixSignal: 29
+DONE: EMA: 180 and trixLength: 48 and trixSignal: 39
+DONE: EMA: 180 and trixLength: 49 and trixSignal: 49
+
+-------------------------------------
+BEST PARAMETER SET FOUND: 
+-------------------------------------
+Strategy : TRIX
+EMA TRIX_L TRIX_S     : 180 9 50
+Best Gain: 18507.4%
+Porfolio : 186074$ (started with 1000$)
+Win rate : 47.7315%
+max DD   : -30.5799%
+Gain/DDC : 420.14
+Score    : 20053.9
+Number of trades: 2160
+Yearly gains: 
+Total fees paid: 23936.7$ (started with 1000$)
+-------------------------------------
+Number of backtests performed : 4050
+Time taken                    : 255 seconds 
+RAM usage                     : 20.7 MB
+-------------------------------------
