@@ -4,7 +4,7 @@
     * `backtest_double_EMA_float.cpp` : finds the two best EMA values for a basic 2-EMA cross-over strategy
     * `backtest_double_EMA_StochRSI_float.cpp` : finds the two best EMA values for a 2-EMA cross-over strategy with Stochastic RSI check (buying if overbought, selling if oversold; was found to be better
     * `backtest_TRIX.cpp` : finds the best EMA value and TRIX Length and Signal values for a TRIX strategy (Crypto Robot inspired)
-    * `backtest_TRIX.cpp` : same as above but with a strategy using 4 coins (BTC ETH BNB XRP) and 4 open positions maximum
+    * `backtest_TRIX_multi_pair.cpp` : same as above but with a strategy using 4 coins (BTC ETH BNB XRP) and 4 open positions maximum
     * Other strategies should be added later
 * use it like a boiler plate code in order to test other strategies and/or parameter space.
 * data is provided in `data` for Binance top 30 coins, several timeframes. If other data is wanted, the user must update it manually and follow the same format: `unix-timestamp(ms);open;high;low;close;volume` (no header).
