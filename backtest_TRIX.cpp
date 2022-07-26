@@ -93,11 +93,11 @@ void INITIALIZE_DATA(const KLINEf &kline)
 
     for (const uint i : range_EMA)
     {
-        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.d_close, i);
+        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.close, i);
     }
     cout << "Calculated EMAs." << endl;
     // StochRSI = TALIB_STOCHRSI_K(kline.d_close,14,3,3);
-    StochRSI = TALIB_STOCHRSI_not_averaged(kline.d_close, 14, 14);
+    StochRSI = TALIB_STOCHRSI_not_averaged(kline.close, 14, 14);
     cout << "Calculated STOCHRSI." << endl;
 
     // for (const uint i : range_trixLength)
@@ -113,11 +113,11 @@ void INITIALIZE_DATA(const KLINEf &kline)
     float yy_b = 1990;
     for (uint ii = 0; ii < kline.nb; ii++)
     {
-        const float yy = get_year_from_timestamp(kline.d_time[ii]);
+        const float yy = get_year_from_timestamp(kline.timestamp[ii]);
         year.push_back(yy);
-        hour.push_back(get_hour_from_timestamp(kline.d_time[ii]));
-        month.push_back(get_month_from_timestamp(kline.d_time[ii]));
-        day.push_back(get_day_from_timestamp(kline.d_time[ii]));
+        hour.push_back(get_hour_from_timestamp(kline.timestamp[ii]));
+        month.push_back(get_month_from_timestamp(kline.timestamp[ii]));
+        day.push_back(get_day_from_timestamp(kline.timestamp[ii]));
         // if (ii<100) cout << StochRSI[ii] << endl;
         if (yy >= start_year && yy_b < start_year)
         {
@@ -139,8 +139,8 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema_v, const int trixLength_
 
     RUN_RESULTf result{};
 
-    std::vector<float> close = KLINEf.d_close;
-    std::vector<int> timestamp = KLINEf.d_time;
+    std::vector<float> close = KLINEf.close;
+    std::vector<uint> timestamp = KLINEf.timestamp;
     std::vector<float> EMA = EMA_LISTS["EMA" + std::to_string(ema_v)];
     std::vector<float> TRIX_HISTO = TALIB_TRIX(close, trixLength_v, trixSignal_v);
 
@@ -302,17 +302,17 @@ KLINEf read_input_data(const std::string &input_file_path)
         stringstream ss{};
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
-        kline.d_time.push_back(ts / 1000);
-        kline.d_open.push_back(op);
-        kline.d_high.push_back(hi);
-        kline.d_low.push_back(lo);
-        kline.d_close.push_back(cl);
+        kline.timestamp.push_back(ts / 1000);
+        kline.open.push_back(op);
+        kline.high.push_back(hi);
+        kline.low.push_back(lo);
+        kline.close.push_back(cl);
         // cout << kline.d_open.back()<<endl;
     }
 
     myfile.close();
 
-    kline.nb = int(kline.d_close.size());
+    kline.nb = int(kline.close.size());
 
     std::cout << "Loaded data file." << std::endl;
     return kline;

@@ -2,9 +2,10 @@
 using namespace std;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_MIN(const std::vector<float> vals, const int period)
+std::vector<float> TALIB_MIN(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -20,27 +21,29 @@ std::vector<float> TALIB_MIN(const std::vector<float> vals, const int period)
                        &outBeg,
                        &outNbElement,
                        &out_val[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_MAX(const std::vector<float> vals, const int period)
+std::vector<float> TALIB_MAX(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -56,27 +59,29 @@ std::vector<float> TALIB_MAX(const std::vector<float> vals, const int period)
                        &outBeg,
                        &outNbElement,
                        &out_val[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_RSI(const std::vector<float> vals, const int period)
+std::vector<float> TALIB_RSI(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -92,27 +97,29 @@ std::vector<float> TALIB_RSI(const std::vector<float> vals, const int period)
                        &outBeg,
                        &outNbElement,
                        &out_val[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_STOCHRSI_K(std::vector<float> vals, const int period, const int k_period, const int d_period)
+std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int period, const int k_period, const int d_period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -124,33 +131,35 @@ std::vector<float> TALIB_STOCHRSI_K(std::vector<float> vals, const int period, c
     int max_idx = vals.size() - 1;
 
     retCode = TA_S_STOCHRSI(min_idx, max_idx,
-                        &vals[0],
-                        period, k_period, d_period,
-                        TA_MAType_SMA,
-                        &outBeg,
-                        &outNbElement,
-                        &out_val[0], &out_val_notused[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+                            &vals[0],
+                            period, k_period, d_period,
+                            TA_MAType_SMA,
+                            &outBeg,
+                            &outNbElement,
+                            &out_val[0], &out_val_notused[0]);
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_EMA(std::vector<float> vals, const int period)
+std::vector<float> TALIB_EMA(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -166,28 +175,28 @@ std::vector<float> TALIB_EMA(std::vector<float> vals, const int period)
                        &outBeg,
                        &outNbElement,
                        &out_val[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::vector<float> TALIB_SMA(std::vector<float> vals, const int period)
+std::vector<float> TALIB_SMA(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;
+    OUT.reserve(vals.size());
 
     TA_Integer outBeg;
     TA_Integer outNbElement;
@@ -203,24 +212,25 @@ std::vector<float> TALIB_SMA(std::vector<float> vals, const int period)
                        &outBeg,
                        &outNbElement,
                        &out_val[0]);
-    
-    for (uint ii = 0; ii < outBeg; ii++)
+
+    for (int ii = 0; ii < outBeg; ii++)
     {
         OUT.push_back(0.0);
     }
 
-    for (uint ii = 0; ii < outNbElement; ii++)
+    for (int ii = 0; ii < outNbElement; ii++)
     {
         OUT.push_back(out_val[ii]);
     }
 
-    if (OUT.size()!=vals.size()) abort();
+    if (OUT.size() != vals.size())
+        abort();
 
     return OUT;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, const int nb_period_stoch, const int nb_period_rsi)
+std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi)
 {
     std::vector<float> stochrsi{};
     stochrsi.reserve(vals.size());
@@ -228,14 +238,14 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, co
     // highest_rsi = rsi.rolling(length).max()
     // stochrsi = (rsi - lowest_rsi) / (highest_rsi - lowest_rsi)
     std::vector<float> rsi = TALIB_RSI(vals, nb_period_rsi);
-    std::cout << "Calculated RSI." << std::endl;
+    //std::cout << "Calculated RSI." << std::endl;
     std::vector<float> highest_rsi = TALIB_MAX(rsi, nb_period_stoch);
     std::vector<float> lowest_rsi = TALIB_MIN(rsi, nb_period_stoch);
 
     for (uint i = 0; i < rsi.size(); i++)
     {
         float val = (rsi[i] - lowest_rsi[i]) / (highest_rsi[i] - lowest_rsi[i]);
-        if (std::isnan(val))
+        if (std::isnan(val) | std::isinf(val))
         {
             val = 0.0;
         }
@@ -247,7 +257,7 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, co
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_TRIX(std::vector<float> vals, const int trixLength, const int trixSignal)
+std::vector<float> TALIB_TRIX(const std::vector<float> &vals, const int trixLength, const int trixSignal)
 {
     std::vector<float> TRIX;
     std::vector<float> TRIX_PCT;
@@ -264,24 +274,25 @@ std::vector<float> TALIB_TRIX(std::vector<float> vals, const int trixLength, con
     TRIX_PCT.push_back(0.0);
     for (uint i = 1; i < TRIX.size(); i++)
     {
-        float val =(TRIX[i]-TRIX[i-1])/TRIX[i-1]*100.0;
-        if (std::isinf(val) | std::isnan(val)) {
-            val=0.0;
+        float val = (TRIX[i] - TRIX[i - 1]) / TRIX[i - 1] * 100.0;
+        if (std::isinf(val) | std::isnan(val))
+        {
+            val = 0.0;
         }
         TRIX_PCT.push_back(val);
     }
 
-    if (TRIX_PCT.size()!=TRIX.size()) 
-    {   
+    if (TRIX_PCT.size() != TRIX.size())
+    {
         std::cout << "ERROR TRIX_PCT.size()!=TRIX.size()" << std::endl;
         std::abort();
     }
 
     TRIX_SIGNAL = TALIB_SMA(TRIX_PCT, trixSignal);
-    
+
     for (uint i = 0; i < TRIX_PCT.size(); i++)
     {
-        TRIX_HISTO.push_back(TRIX_PCT[i]-TRIX_SIGNAL[i]);
+        TRIX_HISTO.push_back(TRIX_PCT[i] - TRIX_SIGNAL[i]);
     }
 
     return TRIX_HISTO;

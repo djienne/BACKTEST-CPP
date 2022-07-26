@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <vector>
+#include <array>
 #include <time.h>
 #include <chrono>
 #include <limits>
@@ -40,8 +41,10 @@ struct RUN_RESULTf
 
 float find_min(const std::vector<float> &vec);
 
-float vector_product(const std::vector<float> &vec,const std::vector<float> &vec2);
-
+float vector_product(const std::vector<float> &vec, const std::vector<float> &vec2);
+float vector_product(const std::array<float, 4> &vec, const std::vector<float> &vec2);
+float vector_product(const std::vector<float> &vec2, const std::array<float, 4> &vec);
+float vector_product(const std::array<float, 4> &vec2, const std::array<float, 4> &vec);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float find_max(const std::vector<float> &vec);

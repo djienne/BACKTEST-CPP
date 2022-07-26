@@ -8,12 +8,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct KLINEf
 {
-    std::vector<int> d_time;
-    std::vector<float> d_open;
-    std::vector<float> d_high;
-    std::vector<float> d_low;
-    std::vector<float> d_close;
-    int nb;
+    std::vector<uint> timestamp;
+    std::vector<float> open;
+    std::vector<float> high;
+    std::vector<float> low;
+    std::vector<float> close;
+    uint nb;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21,22 +21,22 @@ std::vector<float> float_range(const float min, const float max, const float ste
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_MIN(const std::vector<float> vals, const int period);
-std::vector<float> TALIB_MAX(const std::vector<float> vals, const int period);
+std::vector<float> TALIB_MIN(const std::vector<float> &vals, const int period);
+std::vector<float> TALIB_MAX(const std::vector<float> &vals, const int period);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_RSI(const std::vector<float> vals, const int period);
+std::vector<float> TALIB_RSI(const std::vector<float> &vals, const int period);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_EMA(const std::vector<float> vals, const int period);
-std::vector<float> TALIB_SMA(const std::vector<float> vals, const int period);
-std::vector<float> TALIB_TRIX(std::vector<float> vals, const int trixLength, const int trixSignal);
+std::vector<float> TALIB_EMA(const std::vector<float> &vals, const int period);
+std::vector<float> TALIB_SMA(const std::vector<float> &vals, const int period);
+std::vector<float> TALIB_TRIX(const std::vector<float> &vals, const int trixLength, const int trixSignal);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_STOCHRSI_K(std::vector<float> vals, const int period, const int k_period, const int d_period);
-std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> vals, const int nb_period_stoch, const int nb_period_rsi);
+std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int period, const int k_period, const int d_period);
+std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

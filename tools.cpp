@@ -18,12 +18,42 @@ float find_min(const std::vector<float> &vec)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-float vector_product(const std::vector<float> &vec,const std::vector<float> &vec2)
+float vector_product(const std::vector<float> &vec, const std::vector<float> &vec2)
 {
     float out = 0.0;
     for (uint i = 0; i < vec.size(); i++)
     {
-        out += vec[i]*vec2[i];
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 4> &vec, const std::vector<float> &vec2)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::vector<float> &vec2, const std::array<float, 4> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 4> &vec2, const std::array<float, 4> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
     }
     return out;
 }
@@ -132,7 +162,6 @@ double get_wall_time()
 double process_mem_usage()
 {
     double vm_usage = 0.0;
-    double resident_set = 0.0;
 #if defined(__linux__)
 
     // the two fields we want
@@ -146,11 +175,9 @@ double process_mem_usage()
     }
     long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
     vm_usage = vsize / 1024.0 / 1024.0;
-    resident_set = rss * page_size_kb;
 #endif
     return vm_usage;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -161,7 +188,7 @@ std::vector<int> integer_range(const int min, const int max, const int step)
     if (min > max)
         std::abort();
 
-    for (size_t i = min; i <= max-1; i=i+step)
+    for (int i = min; i <= max - 1; i = i + step)
     {
         the_range.push_back(i);
     }
@@ -176,7 +203,7 @@ std::vector<int> integer_range(const int min, const int max)
     if (min > max)
         std::abort();
 
-    for (size_t i = min; i <= max; i++)
+    for (int i = min; i <= max; i++)
     {
         the_range.push_back(i);
     }
@@ -195,7 +222,7 @@ std::vector<float> float_range(const float min, const float max, const float ste
 
     const int nb = int(max - min) / step;
 
-    for (size_t i = 0; i <= nb; i++)
+    for (int i = 0; i <= nb; i++)
     {
         the_range.push_back(min + float(i) * step);
     }

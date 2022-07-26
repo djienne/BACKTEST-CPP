@@ -11,7 +11,7 @@
 #include <ta-lib/ta_libc.h>
 using namespace std;
 
-const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
+const std::string DATAFILE = "./data/Binance/1h/ETH-USDT.csv";
 const std::string STRAT_NAME = "2-EMA crossover with Stoch RSI";
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
@@ -29,8 +29,8 @@ int i_start_year = 0;
 // RANGE OF EMA PERIDOS TO TESTs
 const int period_max_EMA = 600;
 const int range_step = 1;
-std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);
-std::vector<int> range2 = integer_range(2, period_max_EMA, range_step);
+std::vector<int> range_EMA = integer_range(2, period_max_EMA, range_step);
+std::vector<int> range_trixLength = integer_range(2, period_max_EMA, range_step);
 //////////////////////////
 
 uint i_print = 0;
@@ -88,28 +88,28 @@ void INITIALIZE_DATA(const KLINEf &kline)
 {
     std::vector<int> list_ema = {};
 
-    for (uint i = 2; i <= std::max(find_max(range1), find_max(range2)) + 5; i++)
+    for (uint i = 2; i <= std::max(find_max(range_EMA), find_max(range_trixLength)) + 5; i++)
     {
         list_ema.push_back(i);
     }
 
     for (const uint i : list_ema)
     {
-        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.d_close, i);
+        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.close, i);
     }
     cout << "Calculated EMAs." << endl;
-    //StochRSI = TALIB_STOCHRSI_K(kline.d_close,14,3,3);
-    StochRSI = TALIB_STOCHRSI_not_averaged(kline.d_close, 14, 14);
+    //StochRSI = TALIB_STOCHRSI_K(kline.close,14,3,3);
+    StochRSI = TALIB_STOCHRSI_not_averaged(kline.close, 14, 14);
     cout << "Calculated STOCHRSI." << endl;
 
     float yy_b = 1990;
     for (uint ii = 0; ii < kline.nb; ii++)
     {
-        const float yy = get_year_from_timestamp(kline.d_time[ii]);
+        const float yy = get_year_from_timestamp(kline.timestamp[ii]);
         year.push_back(yy);
-        hour.push_back(get_hour_from_timestamp(kline.d_time[ii]));
-        month.push_back(get_month_from_timestamp(kline.d_time[ii]));
-        day.push_back(get_day_from_timestamp(kline.d_time[ii]));
+        hour.push_back(get_hour_from_timestamp(kline.timestamp[ii]));
+        month.push_back(get_month_from_timestamp(kline.timestamp[ii]));
+        day.push_back(get_day_from_timestamp(kline.timestamp[ii]));
         // if (ii<100) cout << StochRSI[ii] << endl;
         if (yy >= start_year && yy_b < start_year)
         {
@@ -131,8 +131,8 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
 
     RUN_RESULTf result{};
 
-    std::vector<float> close = KLINEf.d_close;
-    std::vector<int> timestamp = KLINEf.d_time;
+    std::vector<float> close = KLINEf.close;
+    std::vector<uint> timestamp = KLINEf.timestamp;
     std::vector<float> EMA1 = EMA_LISTS["EMA" + std::to_string(ema1_v)];
     std::vector<float> EMA2 = EMA_LISTS["EMA" + std::to_string(ema2_v)];
 
@@ -289,17 +289,17 @@ KLINEf read_input_data(const std::string &input_file_path)
         stringstream ss{};
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
-        kline.d_time.push_back(ts / 1000);
-        kline.d_open.push_back(op);
-        kline.d_high.push_back(hi);
-        kline.d_low.push_back(lo);
-        kline.d_close.push_back(cl);
-        // cout << kline.d_open.back()<<endl;
+        kline.timestamp.push_back(ts / 1000);
+        kline.open.push_back(op);
+        kline.high.push_back(hi);
+        kline.low.push_back(lo);
+        kline.close.push_back(cl);
+        // cout << kline.open.back()<<endl;
     }
 
     myfile.close();
 
-    kline.nb = int(kline.d_close.size());
+    kline.nb = int(kline.close.size());
 
     std::cout << "Loaded data file." << std::endl;
     return kline;
@@ -362,9 +362,9 @@ int main()
 
     // MAIN LOOP
 
-    for (int ema1 : range1)
+    for (int ema1 : range_EMA)
     {
-        for (int ema2 : range2)
+        for (int ema2 : range_trixLength)
         {
             if (std::abs(ema1-ema2)<3) continue;
 

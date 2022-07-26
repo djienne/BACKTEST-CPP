@@ -16,21 +16,21 @@ const std::string STRAT_NAME = "2-EMA crossover simple";
 
 const float FRACTION_PER_POSI = 1.0;          // FRACTION OF CAPITAL PER POSITION
 const float LEV = 1.0;                        // LEVERAGE
-const float FEE = 0.05;                       // FEES in %
+const float FEE = 0.07;                       // FEES in %
 float FUNDING_FEE = 0.02;                     // FUNDING FEE APPLIED EVERY 8 hours
 const bool CAN_LONG = true;                   // LONG ON OR OFF
 const bool CAN_SHORT = false;                 // SHORT ON OR OFF
 const int MIN_NUMBER_OF_TRADES = 80;          // minimum number of trades required (to avoid some noise / lucky circunstances)
 const float MIN_ALLOWED_MAX_DRAWBACK = -50.0; // %
 const float MAX_ALLOWED_DAYS_BETWEEN_PORTFOLIO_ATH = 365;
-const std::string DATAFILE = "./data/Binance/30m/ETH-USDT.csv";
+const std::string DATAFILE = "./data/Binance/1h/ETH-USDT.csv";
 const float time_frame_in_hours = 1.0;
 
 // RANGE OF EMA PERIDOS TO TEST
 const int period_max_EMA = 600;
 const int range_step = 1;   
-std::vector<int> range1 = integer_range(2, period_max_EMA, range_step);
-std::vector<int> range2 = integer_range(2, period_max_EMA, range_step);
+std::vector<int> range_EMA = integer_range(2, period_max_EMA, range_step);
+std::vector<int> range_trixLength = integer_range(2, period_max_EMA, range_step);
 //////////////////////////
 
 uint i_print = 0;
@@ -82,22 +82,22 @@ void INITIALIZE_DATA(const KLINEf &kline)
 {
     std::vector<int> list_ema = {};
 
-    for (uint i = 2; i <= std::max(find_max(range1), find_max(range2)) + 5; i++)
+    for (uint i = 2; i <= std::max(find_max(range_EMA), find_max(range_trixLength)) + 5; i++)
     {
         list_ema.push_back(i);
     }
 
     for (const uint i : list_ema)
     {
-        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.d_close, i);
+        EMA_LISTS["EMA" + std::to_string(i)] = TALIB_EMA(kline.close, i);
     }
 
     for (uint ii = 0; ii < kline.nb; ii++)
     {
-        year.push_back(get_year_from_timestamp(kline.d_time[ii]));
-        hour.push_back(get_hour_from_timestamp(kline.d_time[ii]));
-        month.push_back(get_month_from_timestamp(kline.d_time[ii]));
-        day.push_back(get_day_from_timestamp(kline.d_time[ii]));
+        year.push_back(get_year_from_timestamp(kline.timestamp[ii]));
+        hour.push_back(get_hour_from_timestamp(kline.timestamp[ii]));
+        month.push_back(get_month_from_timestamp(kline.timestamp[ii]));
+        day.push_back(get_day_from_timestamp(kline.timestamp[ii]));
     }
 
     cout << "Initialized calculations."<< endl;
@@ -146,11 +146,11 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
 
     nb_tested++;
 
-    std::vector<float> close = KLINEf.d_close;
+    std::vector<float> close = KLINEf.close;
 
-    std::vector<int> timestamp = KLINEf.d_time;
+    std::vector<uint> timestamp = KLINEf.timestamp;
 
-    int ii_begin = std::max(find_max(range1), find_max(range2)) + 2;
+    int ii_begin = std::max(find_max(range_EMA), find_max(range_trixLength)) + 2;
 
     for (size_t ii = ii_begin; ii < KLINEf.nb; ii++)
     {
@@ -413,17 +413,17 @@ KLINEf read_input_data(const std::string &input_file_path)
         stringstream ss{};
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
-        kline.d_time.push_back(ts / 1000);
-        kline.d_open.push_back(op);
-        kline.d_high.push_back(hi);
-        kline.d_low.push_back(lo);
-        kline.d_close.push_back(cl);
-        // cout << kline.d_open.back()<<endl;
+        kline.timestamp.push_back(ts / 1000);
+        kline.open.push_back(op);
+        kline.high.push_back(hi);
+        kline.low.push_back(lo);
+        kline.close.push_back(cl);
+        // cout << kline.open.back()<<endl;
     }
 
     myfile.close();
 
-    kline.nb = int(kline.d_close.size());
+    kline.nb = int(kline.close.size());
     return kline;
 }
 
@@ -479,9 +479,9 @@ int main()
 
     // MAIN LOOP
 
-    for (int ema1 : range1)
+    for (int ema1 : range_EMA)
     {
-        for (int ema2 : range2)
+        for (int ema2 : range_trixLength)
         {
             if (ema1 == ema2)
                 continue;
