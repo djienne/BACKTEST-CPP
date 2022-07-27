@@ -35,18 +35,20 @@ struct RUN_RESULTf
     float gain_limit;
     float total_fees_paid;
     int max_delta_t_new_ATH;
+    float calmar_ratio;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-float find_min(const std::vector<float> &vec);
 
 float vector_product(const std::vector<float> &vec, const std::vector<float> &vec2);
 float vector_product(const std::array<float, 4> &vec, const std::vector<float> &vec2);
 float vector_product(const std::vector<float> &vec2, const std::array<float, 4> &vec);
 float vector_product(const std::array<float, 4> &vec2, const std::array<float, 4> &vec);
+float vector_product(const std::array<float, 1> &vec2, const std::array<float, 1> &vec);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+float find_average(const std::vector<float> &vec);
+float find_min(const std::vector<float> &vec);
 float find_max(const std::vector<float> &vec);
 int find_max(const std::vector<int> &vec);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,3 +81,7 @@ std::vector<float> float_range(const float min, const float max, const float ste
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::string ReplaceAll(std::string str, const std::string &from, const std::string &to);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+float calculate_calmar_ratio(const std::vector<int> &times, const std::vector<float> &wallet_vals, const float &max_DD);

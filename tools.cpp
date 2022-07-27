@@ -2,6 +2,18 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+float find_average(const std::vector<float> &vec)
+{
+    float summ = 0.0;
+    for (const float &val : vec)
+    {
+        summ += val;
+    }
+    return summ / float(vec.size());
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 float find_min(const std::vector<float> &vec)
 {
     float min_val = std::numeric_limits<float>::max();
@@ -49,6 +61,16 @@ float vector_product(const std::vector<float> &vec2, const std::array<float, 4> 
 }
 
 float vector_product(const std::array<float, 4> &vec2, const std::array<float, 4> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 1> &vec2, const std::array<float, 1> &vec)
 {
     float out = 0.0;
     for (uint i = 0; i < vec2.size(); i++)
@@ -242,3 +264,55 @@ std::string ReplaceAll(std::string str, const std::string &from, const std::stri
     }
     return str;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+float calculate_calmar_ratio(const std::vector<int> &times, const std::vector<float> &wallet_vals, const float &max_DD)
+{
+
+    if (times.size() <= 4)
+        return -100.0;
+
+    const uint last_idx = times.size() - 1;
+    const int first_year = get_year_from_timestamp(times[0]);
+    const int first_month = get_month_from_timestamp(times[0]);
+    const int first_day = get_day_from_timestamp(times[0]);
+    const int last_year = get_year_from_timestamp(times[last_idx]);
+    const int last_month = get_month_from_timestamp(times[last_idx]);
+    const int last_day = get_day_from_timestamp(times[last_idx]);
+
+    const float factor_first_year = (365.0f - float(first_month) * 30.0f - float(first_day)) / 365.0f;
+    const float factor_last_year = (float(last_month) * 30.0f + float(last_day)) / 365.0f;
+
+    std::vector<float> vals_begin_years{};
+    vals_begin_years.reserve(10);
+
+    vals_begin_years.push_back(1000.0);
+
+    for (uint ii = 1; ii < times.size(); ii++)
+    {
+        const int year_b = get_year_from_timestamp(times[ii - 1]);
+        const int year = get_year_from_timestamp(times[ii]);
+
+        if (year_b != year || ii == times.size() - 1)
+        {
+            vals_begin_years.push_back(wallet_vals[ii]);
+        }
+    }
+
+    std::vector<float> yearly_pc_changes{};
+    yearly_pc_changes.reserve(10);
+    for (uint iy = 1; iy < vals_begin_years.size(); iy++)
+    {
+        yearly_pc_changes.push_back((vals_begin_years[iy] - vals_begin_years[iy - 1]) / vals_begin_years[iy - 1] * 100.0f);
+    }
+
+    // yearly_pc_changes.erase(yearly_pc_changes.begin()); // could remove first and/or lost because the year is not complete
+
+    yearly_pc_changes[0] = yearly_pc_changes[0] * factor_first_year;
+    yearly_pc_changes[yearly_pc_changes.size() - 1] = yearly_pc_changes[yearly_pc_changes.size() - 1] * factor_last_year;
+
+    return find_average(yearly_pc_changes) / max_DD;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -51,19 +51,6 @@ RUN_RESULTf best{};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void print_res(const RUN_RESULTf &bestt)
-{
-    std::cout << "-------------------------------------" << endl;
-    std::cout << "EMA: " << bestt.ema1 << " " << bestt.ema2 << endl;
-    std::cout << "Gain: " << bestt.gain_pc << "%" << endl;
-    std::cout << "Win rate: " << bestt.win_rate << "%" << endl;
-    std::cout << "max DD: " << bestt.max_DD << "%" << endl;
-    std::cout << "Gain over DDC: " << bestt.gain_over_DDC << endl;
-    std::cout << "Score: " << bestt.score << endl;
-    std::cout << "Number of trades: " << bestt.nb_posi_entered << endl;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void print_best_res(const RUN_RESULTf &bestt)
 {
     std::cout << "\n-------------------------------------" << endl;
@@ -77,6 +64,7 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "max DD   : " << bestt.max_DD << "%" << endl;
     std::cout << "Gain/DDC : " << bestt.gain_over_DDC << endl;
     std::cout << "Score    : " << bestt.score << endl;
+    std::cout << "Calmar ratio : " << bestt.calmar_ratio << endl;
     std::cout << "Number of trades: " << bestt.nb_posi_entered << endl;
     std::cout << "Total fees paid: " << round(bestt.total_fees_paid * 100.0f) / 100.0f << "$ (started with 1000$)" << endl;
 
@@ -90,6 +78,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
     nb_tested++;
 
     RUN_RESULTf result{};
+
+    vector<float> USDT_tracking{};
+    vector<int> USDT_tracking_ts{};
 
     array<vector<float>, NB_PAIRS> TRIX_HISTO{};
 
@@ -200,6 +191,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
             pc_change_with_max = (WALLET_VAL_USDT - MAX_WALLET_VAL_USDT) / MAX_WALLET_VAL_USDT * 100.0f;
             if (pc_change_with_max < max_drawdown)
                 max_drawdown = pc_change_with_max;
+
+            USDT_tracking.push_back(WALLET_VAL_USDT);
+            USDT_tracking_ts.push_back(PAIRS[0].timestamp[ii]);
         }
     }
 
@@ -229,6 +223,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
     result.nb_posi_entered = NB_POSI_ENTERED;
     result.win_rate = WR;
     result.score = score;
+    result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
     result.ema1 = ema_v;
     result.trixLength = trixLength_v;
     result.trixSignal = trixSignal_v;
@@ -377,6 +372,7 @@ int main()
     INITIALIZE_DATA(PAIRS); // this function modifies PAIRS
 
     best.gain_over_DDC = -100.0f;
+    best.calmar_ratio = -100.0f;
 
     const uint last_idx = PAIRS[0].nb - 1;
 
@@ -411,7 +407,7 @@ int main()
             {
                 const RUN_RESULTf res = PROCESS(PAIRS, ema, trixL, trixS);
 
-                if (res.gain_over_DDC > best.gain_over_DDC && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+                if (res.calmar_ratio > best.calmar_ratio && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
                 {
                     best = res;
                 }
