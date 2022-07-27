@@ -100,5 +100,5 @@ Time taken                    :  5955  seconds
 RAM usage                     :  86.0  MB
 -------------------------------------
 
-The C++ code is ~3000 faster than the (naive) python.
+The C++ code is ~3000 times faster than the (naive) python.
 ```
