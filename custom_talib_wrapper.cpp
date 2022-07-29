@@ -154,6 +154,7 @@ std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int pe
     return OUT;
 }
 
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::vector<float> TALIB_EMA(const std::vector<float> &vals, const int period)
@@ -353,6 +354,7 @@ SuperTrend TALIB_SuperTrend(const std::vector<float> &high, const std::vector<fl
         hl2.push_back((high[ii] + low[ii]) / 2.0f);
         final_upperband.push_back(hl2[ii] + (float(atr_multi) * ATR[ii]));
         final_lowerband.push_back(hl2[ii] + (float(atr_multi) * ATR[ii]));
+        supertrend.push_back(true);
     }
 
     for (uint ii = 1; ii < high.size(); ii++)
