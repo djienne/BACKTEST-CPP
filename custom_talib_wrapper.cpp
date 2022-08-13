@@ -154,7 +154,6 @@ std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int pe
     return OUT;
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::vector<float> TALIB_EMA(const std::vector<float> &vals, const int period)
@@ -333,56 +332,167 @@ std::vector<float> TALIB_TRIX(const std::vector<float> &vals, const int trixLeng
 
     return TRIX_HISTO;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SuperTrend TALIB_SuperTrend(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
                             const int atr_window, const int atr_multi)
 {
     vector<float> hl2{};
-    vector<float> final_upperband{};
-    vector<float> final_lowerband{};
-    vector<bool> supertrend{};
+    vector<float> upperband{};
+    vector<float> lowerband{};
+    vector<int> dir{};
+    vector<float> trend{};
+    vector<float> longg{};
+    vector<float> shortt{};
+    vector<float> matr{};
     hl2.reserve(high.size());
-    final_upperband.reserve(high.size());
-    final_lowerband.reserve(high.size());
-    supertrend.reserve(high.size());
+    upperband.reserve(high.size());
+    lowerband.reserve(high.size());
+    dir.reserve(high.size());
+    trend.reserve(high.size());
+    longg.reserve(high.size());
+    shortt.reserve(high.size());
+    matr.reserve(high.size());
 
     const vector<float> ATR = TALIB_ATR(high, low, close, atr_window);
 
-    for (uint ii = 0; ii < high.size(); ii++)
+    const uint m = close.size();
+
+    for (uint ii = 0; ii < m; ii++)
+    {
+        dir.push_back(1);
+        trend.push_back(0.0);
+        longg.push_back(NAN);
+        shortt.push_back(NAN);
+    }
+
+    for (uint ii = 0; ii < m; ii++)
     {
         // HL2 is the average of high and low prices
         hl2.push_back((high[ii] + low[ii]) / 2.0f);
-        final_upperband.push_back(hl2[ii] + (float(atr_multi) * ATR[ii]));
-        final_lowerband.push_back(hl2[ii] + (float(atr_multi) * ATR[ii]));
-        supertrend.push_back(true);
+        matr.push_back(float(atr_multi) * ATR[ii]);
+        upperband.push_back(hl2.back() + matr.back());
+        lowerband.push_back(hl2.back() - matr.back());
     }
 
-    for (uint ii = 1; ii < high.size(); ii++)
+    for (uint ii = 1; ii < m; ii++)
     {
-        supertrend[ii] = true;
-        if (close[ii] > final_upperband[ii - 1])
+        if (close[ii] > upperband[ii - 1])
         {
-            supertrend[ii] = true;
+            dir[ii] = 1;
         }
-        else if (close[ii] < final_lowerband[ii - 1])
+        else if (close[ii] < lowerband[ii - 1])
         {
-            supertrend[ii] = false;
+            dir[ii] = -1;
         }
         else
         {
-            supertrend[ii] = supertrend[ii - 1];
-            if (supertrend[ii] == true && final_lowerband[ii] < final_lowerband[ii - 1])
-                final_lowerband[ii] = final_lowerband[ii - 1];
-            if (supertrend[ii] == false && final_upperband[ii] > final_upperband[ii - 1])
-                final_upperband[ii] = final_upperband[ii - 1];
+            dir[ii] = dir[ii - 1];
+            if (dir[ii] > 0 && lowerband[ii] < lowerband[ii - 1])
+            {
+                lowerband[ii] = lowerband[ii - 1];
+            }
+            if (dir[ii] < 0 && upperband[ii] > upperband[ii - 1])
+            {
+                upperband[ii] = upperband[ii - 1];
+            }
         }
 
-        // to remove bands according to the trend direction
-        if (supertrend[ii] == true)
-            final_upperband[ii] = NAN;
+        if (dir[ii] > 0)
+        {
+            trend[ii] = lowerband[ii];
+            longg[ii] = lowerband[ii];
+        }
         else
-            final_lowerband[ii] = NAN;
+        {
+            trend[ii] = upperband[ii];
+            shortt[ii] = upperband[ii];
+        }
     }
 
-    return {supertrend, final_lowerband, final_upperband};
+    return {dir, lowerband, upperband};
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void swap(int *first, int *second)
+{
+    int temp;
+    temp = *first;
+    *first = *second;
+    *second = temp;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<float> TALIB_AO(const std::vector<float> &high, const std::vector<float> &low,
+                            const int fast, const int slow)
+{
+    int fastt = fast;
+    int sloww = slow;
+    if (sloww < fastt)
+    {
+        swap(&fastt, &sloww);
+    }
+
+    const uint m = high.size();
+
+    vector<float> median_price{};
+    vector<float> fast_sma{};
+    vector<float> slow_sma{};
+    vector<float> ao{};
+    median_price.reserve(m);
+    ao.reserve(m);
+
+    for (uint ii = 0; ii < m; ii++)
+    {
+        median_price.push_back(0.5f * (high[ii] + low[ii]));
+    }
+
+    fast_sma = TALIB_SMA(median_price, fastt);
+    slow_sma = TALIB_SMA(median_price, sloww);
+    for (uint ii = 0; ii < m; ii++)
+    {
+        ao.push_back(fast_sma[ii] - slow_sma[ii]);
+    }
+
+    return ao;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector<float> TALIB_WILLR(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
+                               const int length)
+{
+    std::vector<float> OUT;
+    OUT.reserve(high.size());
+
+    TA_Integer outBeg;
+    TA_Integer outNbElement;
+    TA_RetCode retCode;
+    TA_Real out_val[high.size()];
+
+    int min_idx = 0;
+    int max_idx = high.size() - 1;
+
+    retCode = TA_S_WILLR(min_idx, max_idx,
+                         &high[0], &low[0], &close[0],
+                         length,
+                         &outBeg,
+                         &outNbElement,
+                         &out_val[0]);
+
+    for (int ii = 0; ii < outBeg; ii++)
+    {
+        OUT.push_back(0.0);
+    }
+
+    for (int ii = 0; ii < outNbElement; ii++)
+    {
+        OUT.push_back(out_val[ii]);
+    }
+
+    if (OUT.size() != high.size() || OUT.size() != low.size() || OUT.size() != close.size())
+        abort();
+
+    return OUT;
 }

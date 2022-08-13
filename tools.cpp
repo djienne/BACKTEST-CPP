@@ -70,7 +70,93 @@ float vector_product(const std::array<float, 4> &vec2, const std::array<float, 4
     return out;
 }
 
+float vector_product(const std::array<float, 5> &vec2, const std::array<float, 5> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 6> &vec2, const std::array<float, 6> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+float vector_product(const std::array<float, 7> &vec2, const std::array<float, 7> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+float vector_product(const std::array<float, 9> &vec2, const std::array<float, 9> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 10> &vec2, const std::array<float, 10> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
 float vector_product(const std::array<float, 1> &vec2, const std::array<float, 1> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+float vector_product(const std::array<float, 12> &vec2, const std::array<float, 12> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 21> &vec2, const std::array<float, 21> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+float vector_product(const std::array<float, 30> &vec2, const std::array<float, 30> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 20> &vec2, const std::array<float, 20> &vec)
 {
     float out = 0.0;
     for (uint i = 0; i < vec2.size(); i++)
@@ -316,3 +402,38 @@ float calculate_calmar_ratio(const std::vector<int> &times, const std::vector<fl
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void random_shuffle_vector(std::vector<float> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}
+
+void random_shuffle_vector(std::vector<int> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}
+
+void random_shuffle_vector_params(std::vector<trix_params> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}
+
+void random_shuffle_vector_params(std::vector<BigWill_params> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}
+
+void random_shuffle_vector_params(std::vector<SR_params> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}

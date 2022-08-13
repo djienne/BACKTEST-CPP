@@ -17,7 +17,7 @@ struct KLINEf
 };
 struct SuperTrend
 {
-    std::vector<bool> supertrend;
+    std::vector<int> supertrend;
     std::vector<float> final_lowerband;
     std::vector<float> final_upperband;
 };
@@ -51,3 +51,11 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, c
 
 SuperTrend TALIB_SuperTrend(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
                             const int atr_window, const int atr_multi);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector<float> TALIB_AO(const std::vector<float> &high, const std::vector<float> &low,
+                            const int fast, const int slow);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector<float> TALIB_WILLR(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
+                               const int length);
