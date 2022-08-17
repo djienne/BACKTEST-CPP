@@ -1,0 +1,19 @@
+FROM ubuntu:jammy
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install gcc g++ make nodejs npm -y
+WORKDIR /CPP/data
+COPY ./data /CPP/data
+RUN rm -rf /CPP/data/node_modules
+RUN npm install ccxt fs csv-writer
+WORKDIR /
+RUN cd /CPP/data && node download_data2.js
+COPY ./talib/ta-lib-0.4.0-src.tar.gz /CPP/ta-lib-0.4.0-src.tar.gz
+RUN cd /CPP && tar xvzf ta-lib-0.4.0-src.tar.gz
+RUN rm -rf /CPP/talib
+RUN mv /CPP/ta-lib /CPP/talib
+RUN cd /CPP/talib && ./configure --prefix=/CPP/talib/talib_install/ && make && make install && make clean
+RUN cp -u /CPP/talib/talib_install/lib/libta_lib.so.0 /CPP/
+ENV LD_LIBRARY_PATH /CPP/
+

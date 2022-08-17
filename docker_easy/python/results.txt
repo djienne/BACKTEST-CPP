@@ -1,0 +1,49 @@
+
+-------------------------------------
+Strategy to test:  2-EMA crossover with Stoch RSI
+DATA FILE TO PROCESS:  ../data/Binance/4h/BTC-USDT.csv
+                time      open      high       low     close       volume
+10687  1657080000000  19951.47  20337.84  19864.45  20162.22  14768.32563
+10688  1657094400000  20162.21  20303.65  20033.37  20103.43  10987.55751
+10689  1657108800000  20103.44  20366.20  19961.02  20148.86  16962.89906
+10690  1657123200000  20148.85  20208.29  20133.55  20173.10    939.92808
+Loaded data file.
+Calculated EMAs.
+Calculated STOCHRSI.
+Initialized calculations.
+Begin day      :  2017 / 8 / 17
+End day        :  2022 / 7 / 6
+OPEN/CLOSE FEE :  0.07  %
+Minimum number of trades required    :  84
+Maximum drawback (=drawdown) allowed :  -50.0  %
+StochRSI Upper Band   :  0.8
+StochRSI Lower Band   :  0.2
+EMA period max tested :  350
+EMA range step        :  1
+-------------------------------------
+
+-------------------------------------
+BEST PARAMETER SET FOUND: 
+-------------------------------------
+Strategy : 2-EMA crossover with Stoch RSI
+EMAs     :  116   3
+Best Gain: 2247.10%
+Porfolio : 23470.97$ (started with 1000$)
+Win rate : 30.77%
+max DD   : -25.98%
+Gain/DDC : 64.03
+Score    : 1970.23
+Number of trades:  91
+Yearly gains: 
+2017  ::  131.01 %
+2018  ::  -15.08 %
+2019  ::  118.44 %
+2020  ::  269.74 %
+2021  ::  66.87 %
+2022  ::  -11.23 %
+Total fees paid:  1219.54 $ (started with 1000$)
+-------------------------------------
+Number of backtests performed :  1
+Time taken                    :  1  seconds 
+RAM usage                     :  31.4  MB
+-------------------------------------

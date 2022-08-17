@@ -1,0 +1,23 @@
+---
+version: '3'
+services:
+  BACKTEST_CPP:
+    image: ubuntu:jammy
+    build:
+      context: .
+      dockerfile: "./Dockerfile.technical"
+    restart: 'no'
+    container_name: BACKTEST_CPP
+    volumes:
+      - "./strategies:/CPP/strategies"
+    # Default command used when running `docker compose up`
+    command: >
+      bash -c "
+      cp -r /CPP/strategies/*.cpp /CPP/
+      && cp -r /CPP/strategies/*.hh /CPP/
+      && cp -r /CPP/strategies/Makefile /CPP/
+      && cd /CPP 
+      && ls /CPP/data/Binance/1h 
+      && make BigWill
+      && ./BigWill.exe
+      "
