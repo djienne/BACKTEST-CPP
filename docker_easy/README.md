@@ -14,7 +14,7 @@
 * run in terminal `docker-compose up` to compile and run one strategy
 * You may need to be super user (`sudo`)
 * You can edit C++ `.cpp` strategy files in `./strategies/`
-* You can edit which code gets compile and executed in the `docker-compose.yml` file
+* You can edit which code gets compiled and executed in the `docker-compose.yml` file
 
 **Example results:** (2-EMA cross simple strategy)
 ```
