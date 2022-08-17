@@ -10,9 +10,8 @@
 * and a few more...
 
 **How to compile and run**
-* run
-* `docker-compose build` to build (including dependency installation, ta-lib compilation, data download)
-* `docker-compose up` to compile and run one strategy
+* run in terminal `docker-compose build` to build (including dependency installation, ta-lib compilation, data download)
+* run in terminal `docker-compose up` to compile and run one strategy
 * You may need to be super user (`sudo`)
 * You can edit C++ `.cpp` strategy files in `./strategies/`
 * You can edit which code gets compile and executed in the `docker-compose.yml` file
