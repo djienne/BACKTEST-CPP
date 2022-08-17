@@ -18,6 +18,7 @@
 * open a terminal in the root folder (=${fileDirname}) (containing `backtest_*.cpp`), and run `make`
 * execute the backtest with `./backtest_double_EMA_float.exe` (or other `.exe` for other strategies) in the root folder
 * alternatively, run `sh install.sh` in the root folder.
+* alternatively, use the docker-compose project in `docker_easy` (See `README.md` inside)
 
 **Example results:** (2-EMA cross simple strategy)
 ```
