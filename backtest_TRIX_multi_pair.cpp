@@ -13,22 +13,28 @@
 using namespace std;
 using uint = unsigned int;
 
-static const uint NB_PAIRS = 4;
-const uint NB_POSITION_MAX = 4;
-const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP"};
-const string timeframe = "1h";
+const string STRAT_NAME = "TRIX";
 
+static const uint NB_PAIRS = 10;
+const vector<uint> MAX_OPEN_TRADES_TO_TEST{2, 3, 4, 5};
+const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "AVAX", "MATIC", "DOT", "FTT"};
+const string timeframe = "1h";
 const vector<string> DATAFILES = {"./data/Binance/" + timeframe + "/" + COINS[0] + "-USDT.csv",
                                   "./data/Binance/" + timeframe + "/" + COINS[1] + "-USDT.csv",
                                   "./data/Binance/" + timeframe + "/" + COINS[2] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[3] + "-USDT.csv"};
-const string STRAT_NAME = "TRIX";
+                                  "./data/Binance/" + timeframe + "/" + COINS[3] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[4] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[5] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[6] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[7] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[8] + "-USDT.csv",
+                                  "./data/Binance/" + timeframe + "/" + COINS[9] + "-USDT.csv"};
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
 const float FEE = 0.07f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
-const uint MIN_NUMBER_OF_TRADES = 200;         // minimum number of trades required (to avoid some noise / lucky circunstances)
-const float MIN_ALLOWED_MAX_DRAWBACK = -50.0f; // %
+const uint MIN_NUMBER_OF_TRADES = 200;
+const float MIN_ALLOWED_MAX_DRAWBACK = -33.0f; // %
 const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
 uint start_indexes[NB_PAIRS];
@@ -37,9 +43,9 @@ uint start_indexes[NB_PAIRS];
 const int period_max_EMA = 600;
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
-const vector<int> range_EMA = integer_range(40, period_max_EMA + 2, 2);
-const vector<int> range_trixLength = integer_range(2, 100, 1);
-const vector<int> range_trixSignal = integer_range(10, 100, 1);
+vector<int> range_EMA = integer_range(40, period_max_EMA + 2, 3); // best calmar from 40 to 122: 2.34
+const vector<int> range_trixLength = integer_range(2, 100, 2);
+const vector<int> range_trixSignal = integer_range(10, 100, 2);
 //////////////////////////
 array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
 array<vector<float>, NB_PAIRS> StochRSI_LISTS{};
@@ -57,7 +63,8 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "BEST PARAMETER SET FOUND: " << endl;
     std::cout << "-------------------------------------" << endl;
     std::cout << "Strategy : " << STRAT_NAME << endl;
-    std::cout << "EMA TRIX_L TRIX_S     : " << bestt.ema1 << " " << bestt.trixLength << " " << bestt.trixSignal << endl;
+    std::cout << "EMA TRIX_L TRIX_S : " << bestt.ema1 << " " << bestt.trixLength << " " << bestt.trixSignal << endl;
+    std::cout << "Max Open Trades : " << bestt.max_open_trades << endl;
     std::cout << "Best Gain: " << bestt.gain_pc << "%" << endl;
     std::cout << "Porfolio : " << bestt.WALLET_VAL_USDT << "$ (started with 1000$)" << endl;
     std::cout << "Win rate : " << bestt.win_rate << "%" << endl;
@@ -73,7 +80,7 @@ void print_best_res(const RUN_RESULTf &bestt)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trixLength_v, const int trixSignal_v)
+RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trixLength_v, const int trixSignal_v, const uint MAX_OPEN_TRADESS)
 {
     nb_tested++;
 
@@ -157,11 +164,11 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
             }
 
             // OPEN LONG
-            if (COIN_AMOUNTS[ic] == 0.0f && OPEN_LONG_CONDI && LAST_ITERATION == false && ACTIVE_POSITIONS < NB_POSITION_MAX)
+            if (COIN_AMOUNTS[ic] == 0.0f && OPEN_LONG_CONDI && LAST_ITERATION == false && ACTIVE_POSITIONS < MAX_OPEN_TRADESS)
             {
                 price_position_open[ic] = PAIRS[ic].close[ii];
 
-                const float usdMultiplier = 1.0f / float(NB_POSITION_MAX - ACTIVE_POSITIONS);
+                const float usdMultiplier = 1.0f / float(MAX_OPEN_TRADESS - ACTIVE_POSITIONS);
 
                 COIN_AMOUNTS[ic] = USDT_amount * usdMultiplier / PAIRS[ic].close[ii];
                 USDT_amount -= USDT_amount * usdMultiplier;
@@ -209,10 +216,13 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
     const float score = gain / DDC * WR;
 
     i_print++;
-    if (i_print == 1000)
+    if (i_print == 500)
     {
         i_print = 0;
         std::cout << "DONE: EMA: " << ema_v << " and trixLength: " << trixLength_v << " and trixSignal: " << trixSignal_v << endl;
+        int nb_total = range_EMA.size() * range_trixLength.size() * range_trixSignal.size() * MAX_OPEN_TRADES_TO_TEST.size();
+        std::cout << "NB tested = " << nb_tested << "/" << nb_total << endl;
+        std::cout << "Done " << std::round(float(nb_tested) / float(nb_total) * 100.0f * 100.0f) / 100.0f << " %" << endl;
         print_best_res(best);
     }
 
@@ -228,6 +238,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
     result.trixLength = trixLength_v;
     result.trixSignal = trixSignal_v;
     result.total_fees_paid = total_fees_paid_USDT;
+    result.max_open_trades = MAX_OPEN_TRADESS;
 
     return result;
 }
@@ -285,7 +296,7 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
         {
             if (PAIRS[ic].timestamp[0] == PAIRS[0].timestamp[i])
             {
-                start_indexes[ic] = i;
+                start_indexes[ic] = start_indexes[0] + i;
                 std::cout << "Start for " + COINS[ic] << " : " << i << endl;
             }
         }
@@ -327,9 +338,9 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
         StochRSI_LISTS[ic] = TALIB_STOCHRSI_not_averaged(PAIRS[ic].close, 14, 14);
         // std::cout << "Calculated STOCHRSI." << endl;
 
-        for (const uint i : range_EMA)
+        for (const uint ema_per : range_EMA)
         {
-            EMA_LISTS[ic]["EMA_" + std::to_string(i)] = TALIB_EMA(PAIRS[ic].close, i);
+            EMA_LISTS[ic]["EMA_" + std::to_string(ema_per)] = TALIB_EMA(PAIRS[ic].close, ema_per);
         }
         // std::cout << "Calculated EMAs." << endl;
     }
@@ -399,19 +410,35 @@ int main()
 
     // MAIN LOOP
 
-    for (const int ema : range_EMA)
-    {
-        for (const int trixL : range_trixLength)
-        {
-            for (const int trixS : range_trixSignal)
-            {
-                const RUN_RESULTf res = PROCESS(PAIRS, ema, trixL, trixS);
+    std::vector<trix_params> param_list{};
+    param_list.reserve(range_EMA.size() * range_trixLength.size() * range_trixSignal.size() * MAX_OPEN_TRADES_TO_TEST.size());
 
-                if (res.calmar_ratio > best.calmar_ratio && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+    for (const uint MAX_OPEN_TRADES : MAX_OPEN_TRADES_TO_TEST)
+    {
+        for (const int ema : range_EMA)
+        {
+            for (const int trixL : range_trixLength)
+            {
+                for (const int trixS : range_trixSignal)
                 {
-                    best = res;
+                    trix_params to_add{ema, trixL, trixS, MAX_OPEN_TRADES};
+                    param_list.push_back(to_add);
                 }
             }
+        }
+    }
+    std::cout << "Saved parameter list to test." << std::endl;
+    std::cout << "Running all backtests..." << std::endl;
+
+    random_shuffle_vector_params(param_list);
+
+    for (const trix_params par : param_list)
+    {
+        const RUN_RESULTf res = PROCESS(PAIRS, par.ema1, par.trixLength, par.trixSignal, par.max_open_trades);
+
+        if (res.calmar_ratio > best.calmar_ratio && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+        {
+            best = res;
         }
     }
 

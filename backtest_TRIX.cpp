@@ -14,7 +14,7 @@ using namespace std;
 using uint = unsigned int;
 
 static const uint NB_PAIRS = 1;
-const uint NB_POSITION_MAX = 1;
+const uint MAX_OPEN_TRADES = 1;
 const vector<string> COINS = {"ETH"};
 const string timeframe = "1h";
 
@@ -163,11 +163,11 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema_v, const int trix
             }
 
             // OPEN LONG
-            if (COIN_AMOUNTS[ic] == 0.0f && OPEN_LONG_CONDI && LAST_ITERATION == false && ACTIVE_POSITIONS < NB_POSITION_MAX)
+            if (COIN_AMOUNTS[ic] == 0.0f && OPEN_LONG_CONDI && LAST_ITERATION == false && ACTIVE_POSITIONS < MAX_OPEN_TRADES)
             {
                 price_position_open[ic] = PAIRS[ic].close[ii];
 
-                const float usdMultiplier = 1.0f / float(NB_POSITION_MAX - ACTIVE_POSITIONS);
+                const float usdMultiplier = 1.0f / float(MAX_OPEN_TRADES - ACTIVE_POSITIONS);
 
                 COIN_AMOUNTS[ic] = USDT_amount * usdMultiplier / PAIRS[ic].close[ii];
                 USDT_amount -= USDT_amount * usdMultiplier;
@@ -287,7 +287,7 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
         {
             if (PAIRS[ic].timestamp[0] == PAIRS[0].timestamp[i])
             {
-                start_indexes[ic] = i;
+                start_indexes[ic] = start_indexes[0] + i;
                 std::cout << "Start for " + COINS[ic] << " : " << i << endl;
             }
         }

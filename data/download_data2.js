@@ -139,10 +139,10 @@ let exchange = new ccxt.binance({ enableRateLimit: true })
 //pair_list = ["BTC/USDT", "ETH/USDT", 'ADA/USDT', 'XRP/USDT', 'BNB/USDT', 'LINK/USDT', 'LTC/USDT', "DOGE/USDT", "SOL/USDT", "AVAX/USDT", "DOT/USDT", "LUNA/USDT", "MATIC/USDT", "NEAR/USDT", "EGLD/USDT", "XTZ/USDT", "AAVE/USDT", "UNI/USDT", "FTM/USDT", "BCH/USDT"]
 //pair_list = coin_list['binanceTop30']
 
-pair_list = ["BTC/USDT"]
+pair_list = ["BTC/USDT", "ETH/USDT", 'ADA/USDT', 'XRP/USDT', 'BNB/USDT', "SOL/USDT", "AVAX/USDT", "DOT/USDT", "MATIC/USDT", "FTT/USDT"]
 
 // --- Edit timeframe list and start date here ---
-timeframe_list = ['30m']
+timeframe_list = ['1h']
 start_date = "01-01-2017"
 
 
