@@ -2,7 +2,7 @@
 version: '3'
 services:
   BACKTEST_CPP:
-    image: ubuntu:jammy
+    image: ubuntu:focal
     build:
       context: .
       dockerfile: "./Dockerfile.technical"
