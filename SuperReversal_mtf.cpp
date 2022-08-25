@@ -17,7 +17,9 @@ const string STRAT_NAME = "SuperReversal";
 
 static const uint NB_PAIRS = 20;
 const vector<uint> MAX_OPEN_TRADES_TO_TEST{5, 6, 7, 8, 9, 10};
-const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "AVAX", "MATIC", "DOT", "FTT", "CHZ", "EGLD", "ATOM", "ALGO", "NEAR", "LTC", "MANA", "SAND", "APE"};
+const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL",
+                             "AVAX", "MATIC", "DOT", "FTT", "CHZ", "EGLD", 
+                             "ATOM", "ALGO", "NEAR", "LTC", "MANA", "SAND", "APE", "ETC"};
 const string timeframe_1 = "1h";
 const string timeframe_2 = "15m";
 const vector<string> DATAFILES_1h = {"./data/Binance/" + timeframe_1 + "/" + COINS[0] + "-USDT.csv",
@@ -75,7 +77,7 @@ const int period_max = 600;
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
 vector<int> range_ema_fast = integer_range(2, 200 + 4, 2);
-vector<int> range_ema_slow = integer_range(70, period_max + 4, 2);
+vector<int> range_ema_slow = integer_range(70, period_max + 4, 3);
 //////////////////////////
 
 uint last_times[NB_PAIRS];
