@@ -622,11 +622,12 @@ void RESAMPLE_TIMEFRAME(KLINEf &kline_in, KLINEf &kline_out, const int tf_in, co
         std::vector<uint> timestamp_list{};
         // timestamp_list.reserve(kline_in.nb * nb_sampling);
 
-        timestamp_list.push_back(kline_in.timestamp[0]);
+        //timestamp_list.push_back(kline_in.timestamp[0]);
 
         for (int i = 0; i < kline_in.nb; i++)
         {
-            std::vector<float> to_add(nb_sampling, kline_in.indicators[x.first][i]);
+            const float val = x.second[i];
+            const std::vector<float> to_add(nb_sampling, val);
             resampled.insert(resampled.end(), to_add.begin(), to_add.end());
         }
 
@@ -650,10 +651,10 @@ void RESAMPLE_TIMEFRAME(KLINEf &kline_in, KLINEf &kline_out, const int tf_in, co
         //     std::abort();
         // }
 
-        if (timestamp_list[0] != kline_out.timestamp[0])
+        if (kline_in.timestamp[0] != kline_out.timestamp[0])
         {
             std::cout << "Inconsistent first timestamp element. Aborting" << std::endl;
-            std::cout << timestamp_list[0] << " " << kline_out.timestamp[0] << std::endl;
+            std::cout << kline_in.timestamp[0] << " " << kline_out.timestamp[0] << std::endl;
             std::abort();
         }
 

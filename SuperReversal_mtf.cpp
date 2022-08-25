@@ -116,7 +116,9 @@ RUN_RESULTf PROCESS(vector<KLINEf> &PAIRS, const int ema_f, const int ema_s, con
     RUN_RESULTf result{};
 
     vector<float> USDT_tracking{};
+    USDT_tracking.reserve(1000);
     vector<int> USDT_tracking_ts{};
+    USDT_tracking_ts.reserve(1000);
 
     const uint nb_max = PAIRS[0].nb;
 
