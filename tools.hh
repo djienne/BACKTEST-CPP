@@ -76,6 +76,7 @@ float vector_product(const std::array<float, 7> &vec2, const std::array<float, 7
 float vector_product(const std::array<float, 9> &vec2, const std::array<float, 9> &vec);
 float vector_product(const std::array<float, 10> &vec2, const std::array<float, 10> &vec);
 float vector_product(const std::array<float, 12> &vec2, const std::array<float, 12> &vec);
+float vector_product(const std::array<float, 19> &vec2, const std::array<float, 19> &vec);
 float vector_product(const std::array<float, 20> &vec2, const std::array<float, 20> &vec);
 float vector_product(const std::array<float, 21> &vec2, const std::array<float, 21> &vec);
 float vector_product(const std::array<float, 30> &vec2, const std::array<float, 30> &vec);
