@@ -15,7 +15,7 @@ using uint = unsigned int;
 
 const string STRAT_NAME = "SuperReversal";
 
-static const uint NB_PAIRS = 19;
+static const uint NB_PAIRS = 20;
 const vector<uint> MAX_OPEN_TRADES_TO_TEST{5, 6, 7, 8, 9, 10};
 const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "AVAX", "MATIC", "DOT", "FTT", "CHZ", "EGLD", "ATOM", "ALGO", "NEAR", "LTC", "MANA", "SAND", "APE"};
 const string timeframe_1 = "1h";
@@ -38,7 +38,8 @@ const vector<string> DATAFILES_1h = {"./data/Binance/" + timeframe_1 + "/" + COI
                                      "./data/Binance/" + timeframe_1 + "/" + COINS[15] + "-USDT.csv",
                                      "./data/Binance/" + timeframe_1 + "/" + COINS[16] + "-USDT.csv",
                                      "./data/Binance/" + timeframe_1 + "/" + COINS[17] + "-USDT.csv",
-                                     "./data/Binance/" + timeframe_1 + "/" + COINS[18] + "-USDT.csv"};
+                                     "./data/Binance/" + timeframe_1 + "/" + COINS[18] + "-USDT.csv",
+                                     "./data/Binance/" + timeframe_1 + "/" + COINS[19] + "-USDT.csv"};
 
 const vector<string> DATAFILES_15m = {"./data/Binance/" + timeframe_2 + "/" + COINS[0] + "-USDT.csv",
                                       "./data/Binance/" + timeframe_2 + "/" + COINS[1] + "-USDT.csv",
@@ -58,7 +59,8 @@ const vector<string> DATAFILES_15m = {"./data/Binance/" + timeframe_2 + "/" + CO
                                       "./data/Binance/" + timeframe_2 + "/" + COINS[15] + "-USDT.csv",
                                       "./data/Binance/" + timeframe_2 + "/" + COINS[16] + "-USDT.csv",
                                       "./data/Binance/" + timeframe_2 + "/" + COINS[17] + "-USDT.csv",
-                                      "./data/Binance/" + timeframe_2 + "/" + COINS[18] + "-USDT.csv"};
+                                      "./data/Binance/" + timeframe_2 + "/" + COINS[18] + "-USDT.csv",
+                                      "./data/Binance/" + timeframe_2 + "/" + COINS[19] + "-USDT.csv"};
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
 const float FEE = 0.07f;       // FEES in %
@@ -66,7 +68,6 @@ const float USDT_amount_initial = 1000.0f;
 const uint MIN_NUMBER_OF_TRADES = 100;         // minimum number of trades required (to avoid some noise / lucky circunstances)
 const float MIN_ALLOWED_MAX_DRAWBACK = -36.0f; // %
 vector<KLINEf> PAIRS;
-vector<KLINEf> PAIRS_1h;
 uint start_indexes[NB_PAIRS];
 
 // RANGE OF EMA PERIDOS TO TESTs
@@ -161,9 +162,13 @@ RUN_RESULTf PROCESS(vector<KLINEf> &PAIRS, const int ema_f, const int ema_s, con
             // conditions for open / close position
             const std::string ema_f_str = "EMA_" + std::to_string(ema_f) + "_1h";
             const std::string ema_s_str = "EMA_" + std::to_string(ema_s) + "_1h";
-            OPEN_LONG_CONDI = PAIRS[ic].indicators[ema_f_str][ii] > PAIRS[ic].indicators[ema_s_str][ii] && PAIRS[ic].indicators["supertrend_1h"][ii] == 1 && PAIRS[ic].low[ii] < PAIRS[ic].indicators[ema_f_str][ii];
+            OPEN_LONG_CONDI = PAIRS[ic].indicators[ema_f_str][ii] > PAIRS[ic].indicators[ema_s_str][ii] && PAIRS[ic].indicators["supertrend_1h"][ii] == 1 
+                                && PAIRS[ic].close[ii] > PAIRS[ic].indicators[ema_f_str][ii] 
+                                && PAIRS[ic].low[ii] < PAIRS[ic].indicators[ema_f_str][ii];
 
-            CLOSE_LONG_CONDI = (PAIRS[ic].indicators[ema_f_str][ii] < PAIRS[ic].indicators[ema_s_str][ii] || PAIRS[ic].indicators["supertrend_1h"][ii] == -1) && PAIRS[ic].high[ii] > PAIRS[ic].indicators[ema_f_str][ii];
+            CLOSE_LONG_CONDI = (PAIRS[ic].indicators[ema_f_str][ii] < PAIRS[ic].indicators[ema_s_str][ii] || PAIRS[ic].indicators["supertrend_1h"][ii] == -1) 
+                                && PAIRS[ic].close[ii] < PAIRS[ic].indicators[ema_f_str][ii] 
+                                && PAIRS[ic].high[ii] > PAIRS[ic].indicators[ema_f_str][ii];
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
@@ -488,7 +493,7 @@ void INITIALIZE_DATA()
     std::cout << "Running INITIALIZE_DATA..." << endl;
 
     PAIRS = LOAD_LTF_DATA();
-    PAIRS_1h = LOAD_H1_DATA();
+    vector<KLINEf> PAIRS_1h = LOAD_H1_DATA();
 
     // resample 1h to 15min data
     for (uint ic = 0; ic < NB_PAIRS; ic++)
