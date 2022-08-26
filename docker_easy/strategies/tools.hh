@@ -24,6 +24,7 @@ struct RUN_RESULTf
     int ema1;
     int ema2;
     int ema3;
+    int ema4;
     int trixLength;
     int trixSignal;
     float UP;
@@ -53,6 +54,8 @@ struct BigWill_params
 {
     int AO_fast;
     int AO_slow;
+    int ema_f;
+    int ema_s;
     uint max_open_trades;
 };
 
