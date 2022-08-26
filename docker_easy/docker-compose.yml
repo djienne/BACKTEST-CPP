@@ -18,6 +18,6 @@ services:
       && cp -r /CPP/strategies/Makefile /CPP/
       && cd /CPP 
       && ls /CPP/data/Binance/1h 
-      && make SR_mtf
-      && ./SuperReversal_mtf.exe
+      && make BigWill
+      && ./BigWill.exe
       "

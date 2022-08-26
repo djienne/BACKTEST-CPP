@@ -15,27 +15,46 @@ using uint = unsigned int;
 
 const string STRAT_NAME = "BigWill";
 
-static const uint NB_PAIRS = 10;
-const vector<uint> MAX_OPEN_TRADES_TO_TEST{3, 4, 5};
-const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "DOT", "AVAX", "MATIC", "FTT"};
-const string timeframe = "1h";
-
-const vector<string> DATAFILES = {"./data/Binance/" + timeframe + "/" + COINS[0] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[1] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[2] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[3] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[4] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[5] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[6] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[7] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[8] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[9] + "-USDT.csv"};
+const vector<uint> MAX_OPEN_TRADES_TO_TEST{2, 3, 4, 5, 6, 7, 8};
+const vector<string> COINS = {"BTC",
+                              "ETH",
+                              "BNB",
+                              "XRP",
+                              "ADA",
+                              "SOL",
+                              "DOGE",
+                              "DOT",
+                              "TRX",
+                              "AVAX",
+                              "MATIC",
+                              "LTC",
+                              "FTT",
+                              "LINK",
+                              "XMR",
+                              "XLM",
+                              "NEAR",
+                              "ALGO",
+                              "ATOM",
+                              "VET",
+                              "MANA",
+                              "APE",
+                              "XTZ",
+                              "SAND",
+                              "THETA",
+                              "EGLD",
+                              "EOS",
+                              "AAVE",
+                              "FTM",
+                              "ETC"};
+static const uint NB_PAIRS = 30;
+string timeframe = "1h";
+vector<string> DATAFILES{};
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
-const float FEE = 0.05f;       // FEES in %
+const float FEE = 0.07f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
 const uint MIN_NUMBER_OF_TRADES = 100;         // minimum number of trades required (to avoid some noise / lucky circunstances)
-const float MIN_ALLOWED_MAX_DRAWBACK = -33.0f; // %
+const float MIN_ALLOWED_MAX_DRAWBACK = -36.0f; // %
 const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
 const float WillOverSold = -85.0f;
@@ -58,6 +77,16 @@ uint i_print = 0;
 uint nb_tested = 0;
 
 RUN_RESULTf best{};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void fill_datafile_paths()
+{
+    for (uint i = 0; i < COINS.size(); i++)
+    {
+        DATAFILES.push_back("./data/Binance/" + timeframe + "/" + COINS[i] + "-USDT.csv");
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -224,7 +253,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
     const float score = gain / DDC * WR;
 
     i_print++;
-    if (i_print == 1000)
+    if (i_print == 100)
     {
         i_print = 0;
         std::cout << "DONE: Fast - Slow : " << fast << " - " << slow << endl;
@@ -304,6 +333,20 @@ KLINEf read_input_data(const string &input_file_path)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+vector<uint> add_zeros(const vector<uint> &vec_in, const int nb_to_add)
+{
+    vector<uint> vec_to_add(nb_to_add, 0);
+    vec_to_add.insert(vec_to_add.end(), vec_in.begin(), vec_in.end());
+    return vec_to_add;
+}
+vector<float> add_zeros(const vector<float> &vec_in, const int nb_to_add)
+{
+    vector<float> vec_to_add(nb_to_add, 0.0);
+    vec_to_add.insert(vec_to_add.end(), vec_in.begin(), vec_in.end());
+    return vec_to_add;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 // will modify PAIRS since it is passed as reference
 {
@@ -326,15 +369,15 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 
     for (uint ic = 1; ic < NB_PAIRS; ic++)
     {
-        while (PAIRS[ic].close.size() < PAIRS[0].close.size())
-        {
-            PAIRS[ic].timestamp.insert(PAIRS[ic].timestamp.begin(), 0);
-            PAIRS[ic].open.insert(PAIRS[ic].open.begin(), 0.0f);
-            PAIRS[ic].high.insert(PAIRS[ic].high.begin(), 0.0f);
-            PAIRS[ic].low.insert(PAIRS[ic].low.begin(), 0.0f);
-            PAIRS[ic].close.insert(PAIRS[ic].close.begin(), 0.0f);
-            PAIRS[ic].nb++;
-        }
+        const int nb_to_add = PAIRS[0].close.size() - PAIRS[ic].close.size();
+
+        PAIRS[ic].timestamp = add_zeros(PAIRS[ic].timestamp, nb_to_add);
+        PAIRS[ic].open = add_zeros(PAIRS[ic].open, nb_to_add);
+        PAIRS[ic].high = add_zeros(PAIRS[ic].high, nb_to_add);
+        PAIRS[ic].low = add_zeros(PAIRS[ic].low, nb_to_add);
+        PAIRS[ic].close = add_zeros(PAIRS[ic].close, nb_to_add);
+
+        PAIRS[ic].nb = PAIRS[0].close.size();
 
         for (uint ii = 0; ii < start_indexes[ic] + 5; ii++)
         {
@@ -384,6 +427,9 @@ int main()
     std::cout << "\n-------------------------------------" << endl;
     std::cout << "Strategy to test: " << STRAT_NAME << endl;
     std::cout << "DATA FILES TO PROCESS: " << endl;
+
+    fill_datafile_paths();
+
     for (const string &dataf : DATAFILES)
     {
         std::cout << "  " << dataf << endl;

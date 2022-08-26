@@ -1,4 +1,5 @@
 FROM davidsarria/node_cpp
 
+COPY ./data/download_data2.js /CPP/data/
 RUN cd /CPP/data && node download_data2.js
 

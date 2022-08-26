@@ -13,7 +13,7 @@ function date_to_timestamp(my_date) {
 
 function timestamp_to_date(my_tf) {
     my_date = new Date(my_tf);
-    str_date = `${my_date.getUTCDate()}-${my_date.getUTCMonth()+1}-${my_date.getUTCFullYear()} ${my_date.getUTCHours()}:${my_date.getUTCMinutes()}`
+    str_date = `${my_date.getUTCDate()}-${my_date.getUTCMonth() + 1}-${my_date.getUTCFullYear()} ${my_date.getUTCHours()}:${my_date.getUTCMinutes()}`
     return str_date;
 }
 
@@ -88,7 +88,7 @@ async function get_ohlcv(exchange, pair_name, timeframe, since_date, limit, tf_m
         await delay(2000);
     }
     process.stdout.write(`\rLoading ${current_request}/${total_request} requests | ${result_ohlcv.length} candles loaded  \n`);
-    result_ohlcv = result_ohlcv.sort(function(a, b) {
+    result_ohlcv = result_ohlcv.sort(function (a, b) {
         return a[0] - b[0];
     });
     result_ohlcv = eliminate_double_ts(result_ohlcv);
@@ -96,13 +96,13 @@ async function get_ohlcv(exchange, pair_name, timeframe, since_date, limit, tf_m
     let file_pair = pair_name.replace('/', '-');
     let dirpath = './' + exchange_name + '/' + timeframe + '/';
     let filepath = dirpath + file_pair + ".csv";
-    
+
     let first_date = timestamp_to_date(result_ohlcv[0][0]);
 
     await fs.promises.mkdir(dirpath, { recursive: true });
 
     const csvWriter = createCsvWriter({
-        fieldDelimiter:';',
+        fieldDelimiter: ';',
         path: filepath
     });
 
@@ -141,16 +141,43 @@ let exchange = new ccxt.binance({ enableRateLimit: true })
 
 //pair_list = ["FTT/USDT","BTC/USDT","ETH/USDT","BNB/USDT","XRP/USDT","AVAX/USDT","SOL/USDT","MATIC/USDT","ADA/USDT","DOT/USDT","ALGO/USDT","SAND/USDT","MANA/USDT"]
 //pair_list = ["BTC/USDT","ETH/USDT","BNB/USDT","XRP/USDT"]
-pair_list = ["BTC", "ETH", "BNB", "XRP", "ADA", "SOL",
-            "AVAX", "MATIC", "DOT", "FTT", "CHZ", "EGLD", 
-            "ATOM", "ALGO", "NEAR", "LTC", "MANA", "SAND",
-            "APE", "ETC"]
+pair_list = ["BTC",
+    "ETH",
+    "BNB",
+    "XRP",
+    "ADA",
+    "SOL",
+    "DOGE",
+    "DOT",
+    "TRX",
+    "AVAX",
+    "MATIC",
+    "LTC",
+    "FTT",
+    "LINK",
+    "XMR",
+    "XLM",
+    "NEAR",
+    "ALGO",
+    "ATOM",
+    "VET",
+    "MANA",
+    "APE",
+    "XTZ",
+    "SAND",
+    "THETA",
+    "EGLD",
+    "EOS",
+    "AAVE",
+    "FTM",
+    "ETC"];
 
 for (let i = 0; i < pair_list.length; i++) {
-    pair_list[i]=pair_list[i].concat("/USDT")
+    pair_list[i] = pair_list[i].concat("/USDT")
 }
 
-timeframe_list = ['1h',"15m"]
+//timeframe_list = ['1h', "15m"]
+timeframe_list = ['1h']
 start_date = "01-08-2017"
 
 
