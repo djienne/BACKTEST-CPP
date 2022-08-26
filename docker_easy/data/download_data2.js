@@ -141,13 +141,16 @@ let exchange = new ccxt.binance({ enableRateLimit: true })
 
 //pair_list = ["FTT/USDT","BTC/USDT","ETH/USDT","BNB/USDT","XRP/USDT","AVAX/USDT","SOL/USDT","MATIC/USDT","ADA/USDT","DOT/USDT","ALGO/USDT","SAND/USDT","MANA/USDT"]
 //pair_list = ["BTC/USDT","ETH/USDT","BNB/USDT","XRP/USDT"]
-pair_list = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "XRP/USDT", "SOL/USDT", "ADA/USDT", "DOT/USDT", "AVAX/USDT", "MATIC/USDT", "FTT/USDT"]
+pair_list = ["BTC", "ETH", "BNB", "XRP", "ADA", "SOL",
+            "AVAX", "MATIC", "DOT", "FTT", "CHZ", "EGLD", 
+            "ATOM", "ALGO", "NEAR", "LTC", "MANA", "SAND",
+            "APE", "ETC"]
 
-//, "LINK/USDT", "UNI/USDT", "XMR/USDT", "XLM/USDT", "NEAR/USDT", "ALGO/USDT", "ATOM/USDT", "VET/USDT", "MANA/USDT", "APE/USDT", "XTZ/USDT",
-//                             "SAND/USDT", "THETA/USDT", "EGLD/USDT", "EOS/USDT", "AAVE/USDT", "FTM/USDT"]
-//pair_list = ["BTC/USDT"]
-// --- Edit timeframe list and start date here ---
-timeframe_list = ['1h']
+for (let i = 0; i < pair_list.length; i++) {
+    pair_list[i]=pair_list[i].concat("/USDT")
+}
+
+timeframe_list = ['1h',"15m"]
 start_date = "01-08-2017"
 
 

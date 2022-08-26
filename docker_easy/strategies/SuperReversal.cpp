@@ -41,8 +41,8 @@ uint start_indexes[NB_PAIRS];
 const int period_max = 600;
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
-vector<int> range_ema_fast = integer_range(2, 200 + 4, 1);
-vector<int> range_ema_slow = integer_range(70, period_max + 4, 1);
+vector<int> range_ema_fast = integer_range(2, 200 + 4, 2);
+vector<int> range_ema_slow = integer_range(70, period_max + 4, 2);
 //////////////////////////
 array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
 array<SuperTrend, NB_PAIRS> SuperTrend_LISTS{};

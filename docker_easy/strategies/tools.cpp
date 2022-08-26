@@ -118,6 +118,16 @@ float vector_product(const std::array<float, 10> &vec2, const std::array<float, 
     return out;
 }
 
+float vector_product(const std::array<float, 19> &vec2, const std::array<float, 19> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
 float vector_product(const std::array<float, 1> &vec2, const std::array<float, 1> &vec)
 {
     float out = 0.0;

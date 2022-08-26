@@ -2,19 +2,23 @@
 * Technical indicators are provided by TA-lib (Technical Analysis Library)
 * The provided strategies to-be-optimized are (so far):
     * `backtest_double_EMA_float.cpp` : finds the two best EMA values for a basic 2-EMA cross-over strategy
-    * `backtest_double_EMA_StochRSI_float.cpp` : finds the two best EMA values for a 2-EMA cross-over strategy with Stochastic RSI check (buying if overbought, selling if oversold; was found to be better than the opposite)
-    * Other strategies should be added later
+    * `backtest_double_EMA_StochRSI_float.cpp` : finds the two best EMA values for a 2-EMA cross-over strategy with Stochastic RSI check (buying if overbought, selling if oversold; was found to be better
+    * `backtest_TRIX.cpp` : finds the best EMA value and TRIX Length and Signal values for a TRIX strategy (Crypto Robot inspired)
+    * `backtest_TRIX_multi_pair.cpp` : same as above but with a strategy using 4 coins (BTC ETH BNB XRP) and 4 open positions maximum
+    * and a few other strategies...
 * use it like a boiler plate code in order to test other strategies and/or parameter space.
 * data is provided in `data` for Binance top 30 coins, several timeframes. If other data is wanted, the user must update it manually and follow the same format: `unix-timestamp(ms);open;high;low;close;volume` (no header).
 * A python version of `backtest_double_EMA_StochRSI_float` is provided in the `python` folder for sanity check and performance comparison.
-* and a few more...
 
 **How to compile and run**
-* run in terminal `docker-compose build` to build (including dependency installation, ta-lib compilation, data download)
-* run in terminal `docker-compose up` to compile and run one strategy
-* You may need to be super user (`sudo`)
-* You can edit C++ `.cpp` strategy files in `./strategies/`
-* You can edit which code gets compiled and executed in the `docker-compose.yml` file
+*  Instructions for Linux/Ubuntu (if Windows, you can use Virtual Box that is free)
+*  Have a C/C++ compiler installed (recommended g++ and gcc)
+*  Compiling TA-lib (Technical Analysis Library):
+   *  open terminal in folder `talib` and run `./configure --prefix=/$(pwd)/talib_install/` then  `make`  then  `make install` and then  `make clean` 
+* open a terminal in the root folder (=${fileDirname}) (containing `backtest_*.cpp`), and run `make`
+* execute the backtest with `./backtest_double_EMA_float.exe` (or other `.exe` for other strategies) in the root folder
+* alternatively, run `sh install.sh` in the root folder.
+* **alternatively, use the docker-compose project in `docker_easy` (See `README.md` inside)**
 
 **Example results:** (2-EMA cross simple strategy)
 ```

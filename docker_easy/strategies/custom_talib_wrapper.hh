@@ -4,6 +4,8 @@
 #include <fstream>
 #include <math.h>
 #include <ta-lib/ta_libc.h>
+#include <unordered_map>
+#include <map>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct KLINEf
@@ -13,6 +15,7 @@ struct KLINEf
     std::vector<float> high;
     std::vector<float> low;
     std::vector<float> close;
+    std::unordered_map<std::string, std::vector<float>> indicators;
     uint nb;
 };
 struct SuperTrend
@@ -51,7 +54,8 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, c
 
 SuperTrend TALIB_SuperTrend(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
                             const int atr_window, const int atr_multi);
-
+std::vector<float> TALIB_SuperTrend_dir_only(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
+                                           const int atr_window, const int atr_multi);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<float> TALIB_AO(const std::vector<float> &high, const std::vector<float> &low,
                             const int fast, const int slow);
@@ -59,3 +63,6 @@ std::vector<float> TALIB_AO(const std::vector<float> &high, const std::vector<fl
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<float> TALIB_WILLR(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
                                const int length);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void RESAMPLE_TIMEFRAME(KLINEf &kline_in_in, KLINEf &kline_out, const int tf_in, const int tf_out);
