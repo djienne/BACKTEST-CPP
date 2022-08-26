@@ -137,11 +137,11 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
         const string k2 = "EMA_" + std::to_string(ema_slow);
         if (!key_exists(EMA_LISTS[ic], k1))
         {
-            EMA_LISTS[ic]["EMA_" + std::to_string(ema_fast)] = TALIB_EMA(PAIRS[ic].close, ema_fast);
+            EMA_LISTS[ic][k1] = TALIB_EMA(PAIRS[ic].close, ema_fast);
         }
         if (!key_exists(EMA_LISTS[ic], k2))
         {
-            EMA_LISTS[ic]["EMA_" + std::to_string(ema_slow)] = TALIB_EMA(PAIRS[ic].close, ema_slow);
+            EMA_LISTS[ic][k2] = TALIB_EMA(PAIRS[ic].close, ema_slow);
         }
     }
 
