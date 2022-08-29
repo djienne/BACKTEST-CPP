@@ -15,27 +15,46 @@ using uint = unsigned int;
 
 const string STRAT_NAME = "BigWill";
 
-static const uint NB_PAIRS = 10;
-const vector<uint> MAX_OPEN_TRADES_TO_TEST{3, 4, 5};
-const vector<string> COINS = {"BTC", "ETH", "BNB", "XRP", "ADA", "SOL", "DOT", "AVAX", "MATIC", "FTT"};
-const string timeframe = "1h";
-
-const vector<string> DATAFILES = {"./data/Binance/" + timeframe + "/" + COINS[0] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[1] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[2] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[3] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[4] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[5] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[6] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[7] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[8] + "-USDT.csv",
-                                  "./data/Binance/" + timeframe + "/" + COINS[9] + "-USDT.csv"};
+const vector<uint> MAX_OPEN_TRADES_TO_TEST{3, 4, 5, 6, 7, 8};
+const vector<string> COINS = {"BTC",
+                              "ETH",
+                              "BNB",
+                              "XRP",
+                              "ADA",
+                              "SOL",
+                              "DOGE",
+                              "DOT",
+                              "TRX",
+                              "AVAX",
+                              "MATIC",
+                              "LTC",
+                              "FTT",
+                              "LINK",
+                              "XMR",
+                              "XLM",
+                              "NEAR",
+                              "ALGO",
+                              "ATOM",
+                              "VET",
+                              "MANA",
+                              "APE",
+                              "XTZ",
+                              "SAND",
+                              "THETA",
+                              "EGLD",
+                              "EOS",
+                              "AAVE",
+                              "FTM",
+                              "ETC"};
+static const uint NB_PAIRS = 30;
+string timeframe = "1h";
+vector<string> DATAFILES{};
 
 const float start_year = 2017; // forced year to start (applies if data below is available)
-const float FEE = 0.05f;       // FEES in %
+const float FEE = 0.07f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
 const uint MIN_NUMBER_OF_TRADES = 100;         // minimum number of trades required (to avoid some noise / lucky circunstances)
-const float MIN_ALLOWED_MAX_DRAWBACK = -33.0f; // %
+const float MIN_ALLOWED_MAX_DRAWBACK = -36.0f; // %
 const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
 const float WillOverSold = -85.0f;
@@ -45,8 +64,10 @@ uint start_indexes[NB_PAIRS];
 // RANGE OF PERIDOS TO TEST
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
-vector<int> range_AO_fast = integer_range(2, 150, 1);
-vector<int> range_AO_slow = integer_range(2, 200, 1);
+vector<int> range_AO_fast = integer_range(2, 100, 1);
+vector<int> range_AO_slow = integer_range(2, 100, 1);
+vector<int> range_EMA_fast = integer_range(2, 102, 2);
+vector<int> range_EMA_slow = integer_range(50, 305, 4);
 //////////////////////////
 array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
 array<vector<float>, NB_PAIRS> StochRSI{};
@@ -61,13 +82,24 @@ RUN_RESULTf best{};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void fill_datafile_paths()
+{
+    for (uint i = 0; i < COINS.size(); i++)
+    {
+        DATAFILES.push_back("./data/Binance/" + timeframe + "/" + COINS[i] + "-USDT.csv");
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void print_best_res(const RUN_RESULTf &bestt)
 {
     std::cout << "\n-------------------------------------" << endl;
     std::cout << "BEST PARAMETER SET FOUND: " << endl;
     std::cout << "-------------------------------------" << endl;
     std::cout << "Strategy : " << STRAT_NAME << endl;
-    std::cout << "Fast - Slow : " << bestt.ema1 << " - " << bestt.ema2 << endl;
+    std::cout << "AO Fast - Slow : " << bestt.ema1 << " - " << bestt.ema2 << endl;
+    std::cout << "EMA Fast - Slow : " << bestt.ema3 << " - " << bestt.ema4 << endl;
     std::cout << "Max Open Trades : " << bestt.max_open_trades << endl;
     std::cout << "Best Gain: " << bestt.gain_pc << "%" << endl;
     std::cout << "Porfolio : " << bestt.WALLET_VAL_USDT << "$ (started with 1000$)" << endl;
@@ -83,9 +115,35 @@ void print_best_res(const RUN_RESULTf &bestt)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow, const uint MAX_OPEN_TRADES)
+bool key_exists(std::unordered_map<string, vector<float>> m, const string &ch)
+{
+    if (m.find(ch) != m.end())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow, int ema_fast, int ema_slow, const uint MAX_OPEN_TRADES)
 {
     nb_tested++;
+
+    for (int ic = 0; ic < NB_PAIRS; ic++)
+    {
+        const string k1 = "EMA_" + std::to_string(ema_fast);
+        const string k2 = "EMA_" + std::to_string(ema_slow);
+        if (!key_exists(EMA_LISTS[ic], k1))
+        {
+            EMA_LISTS[ic][k1] = TALIB_EMA(PAIRS[ic].close, ema_fast);
+        }
+        if (!key_exists(EMA_LISTS[ic], k2))
+        {
+            EMA_LISTS[ic][k2] = TALIB_EMA(PAIRS[ic].close, ema_slow);
+        }
+    }
 
     RUN_RESULTf result{};
 
@@ -141,7 +199,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
                 TP_condition = pc_gain > 15.0f;
             }
 
-            OPEN_LONG_CONDI = EMA_LISTS[ic]["EMA_100"][ii] >= EMA_LISTS[ic]["EMA_200"][ii] && WILLR[ic][ii] < WillOverSold && AO[ic][ii] > 0.0f && AO[ic][ii - 1] > AO[ic][ii];
+            OPEN_LONG_CONDI = EMA_LISTS[ic]["EMA_" + std::to_string(ema_fast)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema_slow)][ii] && WILLR[ic][ii] < WillOverSold && AO[ic][ii] > 0.0f && AO[ic][ii - 1] > AO[ic][ii];
             CLOSE_LONG_CONDI = (AO[ic][ii] < 0.0f && StochRSI[ic][ii] > STOCH_RSI_LOWER) || WILLR[ic][ii] > WillOverBought || TP_condition;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
@@ -224,12 +282,12 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
     const float score = gain / DDC * WR;
 
     i_print++;
-    if (i_print == 1000)
+    if (i_print == 100)
     {
         i_print = 0;
         std::cout << "DONE: Fast - Slow : " << fast << " - " << slow << endl;
-        std::cout << "NB tested = " << nb_tested << "/" << range_AO_slow.size() * range_AO_fast.size() * MAX_OPEN_TRADES_TO_TEST.size() << endl;
-        std::cout << "Done " << std::round(float(nb_tested) / float(range_AO_slow.size() * range_AO_fast.size() * MAX_OPEN_TRADES_TO_TEST.size()) * 100.0f * 100.0f) / 100.0f << " %" << endl;
+        std::cout << "NB tested = " << nb_tested << "/" << range_AO_slow.size() * range_AO_fast.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA_fast.size() * range_EMA_slow.size() << endl;
+        std::cout << "Done " << std::round(float(nb_tested) / float(range_AO_slow.size() * range_AO_fast.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA_fast.size() * range_EMA_slow.size()) * 100.0f * 100.0f) / 100.0f << " %" << endl;
         print_best_res(best);
     }
 
@@ -243,6 +301,8 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
     result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
     result.ema1 = fast;
     result.ema2 = slow;
+    result.ema3 = ema_fast;
+    result.ema4 = ema_slow;
     result.total_fees_paid = total_fees_paid_USDT;
     result.max_open_trades = MAX_OPEN_TRADES;
 
@@ -304,12 +364,26 @@ KLINEf read_input_data(const string &input_file_path)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+vector<uint> add_zeros(const vector<uint> &vec_in, const int nb_to_add)
+{
+    vector<uint> vec_to_add(nb_to_add, 0);
+    vec_to_add.insert(vec_to_add.end(), vec_in.begin(), vec_in.end());
+    return vec_to_add;
+}
+vector<float> add_zeros(const vector<float> &vec_in, const int nb_to_add)
+{
+    vector<float> vec_to_add(nb_to_add, 0.0);
+    vec_to_add.insert(vec_to_add.end(), vec_in.begin(), vec_in.end());
+    return vec_to_add;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 // will modify PAIRS since it is passed as reference
 {
     std::cout << "Running INITIALIZE_DATA..." << endl;
 
-    start_indexes[0] = find_max(range_AO_slow) + 2;
+    start_indexes[0] = 400;
 
     // find initial indexes (different starting times)
     for (uint i = 0; i < PAIRS[0].timestamp.size(); i++)
@@ -326,15 +400,15 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 
     for (uint ic = 1; ic < NB_PAIRS; ic++)
     {
-        while (PAIRS[ic].close.size() < PAIRS[0].close.size())
-        {
-            PAIRS[ic].timestamp.insert(PAIRS[ic].timestamp.begin(), 0);
-            PAIRS[ic].open.insert(PAIRS[ic].open.begin(), 0.0f);
-            PAIRS[ic].high.insert(PAIRS[ic].high.begin(), 0.0f);
-            PAIRS[ic].low.insert(PAIRS[ic].low.begin(), 0.0f);
-            PAIRS[ic].close.insert(PAIRS[ic].close.begin(), 0.0f);
-            PAIRS[ic].nb++;
-        }
+        const int nb_to_add = PAIRS[0].close.size() - PAIRS[ic].close.size();
+
+        PAIRS[ic].timestamp = add_zeros(PAIRS[ic].timestamp, nb_to_add);
+        PAIRS[ic].open = add_zeros(PAIRS[ic].open, nb_to_add);
+        PAIRS[ic].high = add_zeros(PAIRS[ic].high, nb_to_add);
+        PAIRS[ic].low = add_zeros(PAIRS[ic].low, nb_to_add);
+        PAIRS[ic].close = add_zeros(PAIRS[ic].close, nb_to_add);
+
+        PAIRS[ic].nb = PAIRS[0].close.size();
 
         for (uint ii = 0; ii < start_indexes[ic] + 5; ii++)
         {
@@ -354,12 +428,6 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
     std::cout << "Done." << std::endl;
 
     //
-    for (uint ic = 0; ic < NB_PAIRS; ic++)
-    {
-        EMA_LISTS[ic]["EMA_100"] = TALIB_EMA(PAIRS[ic].close, 100);
-        EMA_LISTS[ic]["EMA_200"] = TALIB_EMA(PAIRS[ic].close, 200);
-    }
-    cout << "Calculated EMA 100 and 200." << endl;
 
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
@@ -384,6 +452,9 @@ int main()
     std::cout << "\n-------------------------------------" << endl;
     std::cout << "Strategy to test: " << STRAT_NAME << endl;
     std::cout << "DATA FILES TO PROCESS: " << endl;
+
+    fill_datafile_paths();
+
     for (const string &dataf : DATAFILES)
     {
         std::cout << "  " << dataf << endl;
@@ -448,12 +519,18 @@ int main()
         {
             for (const int slow : range_AO_slow)
             {
-                if (std::abs(fast - slow) < 7 || fast > slow)
-                    continue;
+                for (const int ema_f : range_EMA_fast)
+                {
+                    for (const int ema_s : range_EMA_slow)
+                    {
+                        if (std::abs(fast - slow) < 7 || fast > slow)
+                            continue;
 
-                const BigWill_params to_add{fast, slow, max_op_tr};
+                        const BigWill_params to_add{fast, slow, ema_f, ema_s, max_op_tr};
 
-                param_list.push_back(to_add);
+                        param_list.push_back(to_add);
+                    }
+                }
             }
         }
     }
@@ -465,7 +542,7 @@ int main()
 
     for (const auto para : param_list)
     {
-        const RUN_RESULTf res = PROCESS(PAIRS, para.AO_fast, para.AO_slow, para.max_open_trades);
+        const RUN_RESULTf res = PROCESS(PAIRS, para.AO_fast, para.AO_slow, para.ema_f, para.ema_s, para.max_open_trades);
 
         if (res.calmar_ratio > best.calmar_ratio && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
         {
