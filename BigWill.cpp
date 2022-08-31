@@ -64,10 +64,10 @@ uint start_indexes[NB_PAIRS];
 // RANGE OF PERIDOS TO TEST
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
-vector<int> range_AO_fast = integer_range(2, 100, 1);
-vector<int> range_AO_slow = integer_range(2, 100, 1);
-vector<int> range_EMA_fast = integer_range(2, 102, 2);
-vector<int> range_EMA_slow = integer_range(50, 305, 4);
+vector<int> range_AO_fast = integer_range(2, 102, 2);
+vector<int> range_AO_slow = integer_range(2, 105, 5);
+vector<int> range_EMA_fast = integer_range(2, 105, 5);
+vector<int> range_EMA_slow = integer_range(50, 310, 10);
 //////////////////////////
 array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
 array<vector<float>, NB_PAIRS> StochRSI{};
@@ -311,6 +311,8 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int fast, const int slow,
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int super_index = 0;
+long int previous_ts = 0;
+int nb_read = 0;
 KLINEf read_input_data(const string &input_file_path)
 {
     KLINEf kline;
@@ -319,10 +321,11 @@ KLINEf read_input_data(const string &input_file_path)
     string line;
     long int ts;
     float op, hi, lo, cl, vol;
-
+    previous_ts = 0;
     ifstream file(input_file_path);
     string value;
     vector<string> getInform;
+    nb_read=0;
     while (file.good())
     {
         getline(file, value);
@@ -333,10 +336,17 @@ KLINEf read_input_data(const string &input_file_path)
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
         kline.timestamp.push_back(ts / 1000);
+        if (previous_ts==ts) {
+            std::cout << "FOUND DUPLICATE TS at index " << nb_read << "; INGNORING. "<< std::endl;
+            previous_ts = ts / 1000;
+            continue;
+        }
+        previous_ts = ts;
         kline.open.push_back(op);
         kline.high.push_back(hi);
         kline.low.push_back(lo);
         kline.close.push_back(cl);
+        nb_read++;
     }
 
     last_times[super_index] = kline.timestamp.back();

@@ -251,6 +251,8 @@ RUN_RESULTf PROCESS(vector<KLINEf> &PAIRS, const int ema_f, const int ema_s, con
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int super_index = 0;
+long int previous_ts = 0;
+int nb_read = 0;
 KLINEf read_input_data(const string &input_file_path)
 {
     KLINEf kline;
@@ -259,10 +261,11 @@ KLINEf read_input_data(const string &input_file_path)
     string line;
     long int ts;
     float op, hi, lo, cl, vol;
-
+    previous_ts = 0;
     ifstream file(input_file_path);
     string value;
     vector<string> getInform;
+    nb_read=0;
     while (file.good())
     {
         getline(file, value);
@@ -273,10 +276,17 @@ KLINEf read_input_data(const string &input_file_path)
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
         kline.timestamp.push_back(ts / 1000);
+        if (previous_ts==ts) {
+            std::cout << "FOUND DUPLICATE TS at index " << nb_read << "; INGNORING. "<< std::endl;
+            previous_ts = ts / 1000;
+            continue;
+        }
+        previous_ts = ts;
         kline.open.push_back(op);
         kline.high.push_back(hi);
         kline.low.push_back(lo);
         kline.close.push_back(cl);
+        nb_read++;
     }
 
     last_times[super_index] = kline.timestamp.back();

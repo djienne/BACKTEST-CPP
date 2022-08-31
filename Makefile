@@ -27,7 +27,6 @@ BigWill: tools.cpp custom_talib_wrapper.cpp BigWill.cpp custom_talib_wrapper.hh 
 BigWill_d: tools.cpp custom_talib_wrapper.cpp BigWill.cpp custom_talib_wrapper.hh tools.hh  
 	g++ -g -fsanitize=address -I./talib/talib_install/include/ ./custom_talib_wrapper.hh ./custom_talib_wrapper.cpp ./tools.hh ./tools.cpp ./BigWill.cpp -L./talib/talib_install/lib -lta_lib -lpthread -o ./BigWill.exe
 
-
 SR_mtf :  tools.cpp custom_talib_wrapper.cpp SuperReversal_mtf.cpp custom_talib_wrapper.hh tools.hh  
 	g++ -Ofast -I./talib/talib_install/include/ ./custom_talib_wrapper.hh ./custom_talib_wrapper.cpp ./tools.hh ./tools.cpp ./SuperReversal_mtf.cpp -L./talib/talib_install/lib -lta_lib -lpthread -o ./SuperReversal_mtf.exe
 	

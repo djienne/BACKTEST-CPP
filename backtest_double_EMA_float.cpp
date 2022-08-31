@@ -387,26 +387,25 @@ RUN_RESULTf PROCESS(const KLINEf &KLINEf, const int ema1_v, const int ema2_v)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-KLINEf read_input_data(const std::string &input_file_path)
+int super_index = 0;
+long int previous_ts = 0;
+int nb_read = 0;
+KLINEf read_input_data(const string &input_file_path)
 {
     KLINEf kline;
 
     ifstream myfile(input_file_path);
-    std::string line;
+    string line;
     long int ts;
     float op, hi, lo, cl, vol;
-    int ho;
-    char comma = ';';
-    bool first_line = true;
-
+    previous_ts = 0;
     ifstream file(input_file_path);
     string value;
     vector<string> getInform;
+    nb_read=0;
     while (file.good())
     {
         getline(file, value);
-        const auto pos = value.find(';');
         value = ReplaceAll(value, ";", " ");
         getInform.push_back(value);
         // getInform.erase(getInform.begin()+1);
@@ -414,11 +413,17 @@ KLINEf read_input_data(const std::string &input_file_path)
         ss << value;
         ss >> ts >> op >> hi >> lo >> cl >> vol;
         kline.timestamp.push_back(ts / 1000);
+        if (previous_ts==ts) {
+            std::cout << "FOUND DUPLICATE TS at index " << nb_read << "; INGNORING. "<< std::endl;
+            previous_ts = ts / 1000;
+            continue;
+        }
+        previous_ts = ts;
         kline.open.push_back(op);
         kline.high.push_back(hi);
         kline.low.push_back(lo);
         kline.close.push_back(cl);
-        // cout << kline.open.back()<<endl;
+        nb_read++;
     }
 
     myfile.close();
