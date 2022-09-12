@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cd talib
 ./configure --prefix=/$(pwd)/talib_install/
 make
