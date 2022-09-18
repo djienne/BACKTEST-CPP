@@ -470,7 +470,7 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
-        StochRSI_K[ic] = TALIB_ATR(PAIRS[ic].high,PAIRS[ic].low,PAIRS[ic].close, 14);
+        ATR[ic] = TALIB_ATR(PAIRS[ic].high,PAIRS[ic].low,PAIRS[ic].close, 14);
     }
     cout << "Calculated ATR." << endl;
 }
