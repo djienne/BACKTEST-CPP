@@ -315,7 +315,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     result.ema2 = ema2;
     result.ema3 = ema3;
     result.up = up;
-    result.up = down;
+    result.down = down;
     result.total_fees_paid = total_fees_paid_USDT;
     result.max_open_trades = MAX_OPEN_TRADES;
 
