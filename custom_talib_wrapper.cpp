@@ -156,6 +156,46 @@ std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int pe
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::vector<float> TALIB_STOCHRSI_D(const std::vector<float> &vals, const int period, const int k_period, const int d_period)
+{
+    std::vector<float> OUT;
+    OUT.reserve(vals.size());
+
+    TA_Integer outBeg;
+    TA_Integer outNbElement;
+    TA_RetCode retCode;
+    TA_Real out_val[vals.size()];
+    TA_Real out_val_notused[vals.size()];
+
+    int min_idx = 0;
+    int max_idx = vals.size() - 1;
+
+    retCode = TA_S_STOCHRSI(min_idx, max_idx,
+                            &vals[0],
+                            period, k_period, d_period,
+                            TA_MAType_SMA,
+                            &outBeg,
+                            &outNbElement,
+                            &out_val_notused[0], &out_val[0]);
+
+    for (int ii = 0; ii < outBeg; ii++)
+    {
+        OUT.push_back(0.0);
+    }
+
+    for (int ii = 0; ii < outNbElement; ii++)
+    {
+        OUT.push_back(out_val[ii]);
+    }
+
+    if (OUT.size() != vals.size())
+        abort();
+
+    return OUT;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 std::vector<float> TALIB_EMA(const std::vector<float> &vals, const int period)
 {
     std::vector<float> OUT;

@@ -48,6 +48,7 @@ std::vector<float> TALIB_TRIX(const std::vector<float> &vals, const int trixLeng
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int period, const int k_period, const int d_period);
+std::vector<float> TALIB_STOCHRSI_D(const std::vector<float> &vals, const int period, const int k_period, const int d_period);
 std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

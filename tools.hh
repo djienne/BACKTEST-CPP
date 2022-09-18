@@ -36,6 +36,8 @@ struct RUN_RESULTf
     float RSI_limit;
     float RSI_limit2;
     float gain_limit;
+    float up;
+    float down;
     float total_fees_paid;
     int max_delta_t_new_ATH;
     float calmar_ratio;
@@ -56,6 +58,16 @@ struct BigWill_params
     int AO_slow;
     int ema_f;
     int ema_s;
+    uint max_open_trades;
+};
+
+struct EMA3_params
+{
+    int ema1;
+    int ema2;
+    int ema3;
+    float up;
+    float down;
     uint max_open_trades;
 };
 
@@ -135,4 +147,6 @@ void random_shuffle_vector_params(std::vector<trix_params> &vec_in);
 void random_shuffle_vector_params(std::vector<BigWill_params> &vec_in);
 
 void random_shuffle_vector_params(std::vector<SR_params> &vec_in);
+
+void random_shuffle_vector_params(std::vector<EMA3_params> &vec_in);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

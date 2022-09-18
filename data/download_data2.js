@@ -177,7 +177,7 @@ for (let i = 0; i < pair_list.length; i++) {
 }
 
 //timeframe_list = ['1h', "15m"]
-timeframe_list = ['1h','4h','15m']
+timeframe_list = ['5m']
 start_date = "01-08-2017"
 
 

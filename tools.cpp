@@ -447,3 +447,10 @@ void random_shuffle_vector_params(std::vector<SR_params> &vec_in)
     std::default_random_engine e(seed);
     std::shuffle(vec_in.begin(), vec_in.end(), e);
 }
+
+void random_shuffle_vector_params(std::vector<EMA3_params> &vec_in)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+    std::shuffle(vec_in.begin(), vec_in.end(), e);
+}
