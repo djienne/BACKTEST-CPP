@@ -532,8 +532,9 @@ int main()
     // std::cout << "Maximum number open trades: " << MAX_OPEN_TRADES << endl;
     std::cout << "Minimum number of trades required    : " << MIN_NUMBER_OF_TRADES << endl;
     std::cout << "Maximum drawback (=drawdown) allowed : " << MIN_ALLOWED_MAX_DRAWBACK << " %" << endl;
-    std::cout << "fast period max tested : " << find_max(range_EMA1) << endl;
-    std::cout << "slow period max tested : " << find_max(range_EMA2) << endl;
+    std::cout << "EMA1 max tested : " << find_max(range_EMA1) << endl;
+    std::cout << "EMA2 max tested : " << find_max(range_EMA2) << endl;
+    std::cout << "EMA3 max tested : " << find_max(range_EMA3) << endl;
     std::cout << "StochRSI Upper Band   : " << STOCH_RSI_UPPER << endl;
     std::cout << "StochRSI Lower Band   : " << STOCH_RSI_LOWER << endl;
     std::cout << "-------------------------------------" << endl;
