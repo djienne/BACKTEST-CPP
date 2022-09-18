@@ -554,9 +554,7 @@ int main()
                     {
                         for (const float down : range_DOWN)
                         {
-
                             const EMA3_params to_add{ema1, ema2, ema3, up, down, max_op_tr};
-
                             param_list.push_back(to_add);
                         }
                     }
