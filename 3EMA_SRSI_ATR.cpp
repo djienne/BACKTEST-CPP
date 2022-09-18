@@ -463,10 +463,10 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
-        StochRSI_K[ic] = TALIB_STOCHRSI_K(PAIRS[ic].close, 14, 14, 3);
-        StochRSI_D[ic] = TALIB_STOCHRSI_D(PAIRS[ic].close, 14, 14, 3);
+        StochRSI_K[ic] = TALIB_STOCHRSI_K(PAIRS[ic].close, 14, 14, 3, 3);
+        StochRSI_D[ic] = TALIB_STOCHRSI_D(PAIRS[ic].close, 14, 14, 3, 3);
     }
-    cout << "Calculated STOCHRSI." << endl;
+    cout << "Calculated STOCHRSI K and D." << endl;
 
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {

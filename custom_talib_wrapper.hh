@@ -47,8 +47,8 @@ std::vector<float> TALIB_TRIX(const std::vector<float> &vals, const int trixLeng
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int period, const int k_period, const int d_period);
-std::vector<float> TALIB_STOCHRSI_D(const std::vector<float> &vals, const int period, const int k_period, const int d_period);
+std::vector<float> TALIB_STOCHRSI_K(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi, const int k_period, const int d_period);
+std::vector<float> TALIB_STOCHRSI_D(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi, const int k_period, const int d_period);
 std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, const int nb_period_stoch, const int nb_period_rsi);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ std::vector<float> TALIB_STOCHRSI_not_averaged(const std::vector<float> &vals, c
 SuperTrend TALIB_SuperTrend(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
                             const int atr_window, const int atr_multi);
 std::vector<float> TALIB_SuperTrend_dir_only(const std::vector<float> &high, const std::vector<float> &low, const std::vector<float> &close,
-                                           const int atr_window, const int atr_multi);
+                                             const int atr_window, const int atr_multi);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector<float> TALIB_AO(const std::vector<float> &high, const std::vector<float> &low,
                             const int fast, const int slow);

@@ -35,3 +35,6 @@ SR_mtf_d :  tools.cpp custom_talib_wrapper.cpp SuperReversal_mtf.cpp custom_tali
 
 3EMA_SRSI_ATR : tools.cpp custom_talib_wrapper.cpp 3EMA_SRSI_ATR.cpp custom_talib_wrapper.hh tools.hh  
 	g++ -Ofast -I./talib/talib_install/include/ ./custom_talib_wrapper.hh ./custom_talib_wrapper.cpp ./tools.hh ./tools.cpp ./3EMA_SRSI_ATR.cpp -L./talib/talib_install/lib -lta_lib -lpthread -o ./3EMA_SRSI_ATR.exe 
+
+3EMA_SRSI_ATR_d : tools.cpp custom_talib_wrapper.cpp 3EMA_SRSI_ATR.cpp custom_talib_wrapper.hh tools.hh  
+	g++ -g -fsanitize=address -I./talib/talib_install/include/ ./custom_talib_wrapper.hh ./custom_talib_wrapper.cpp ./tools.hh ./tools.cpp ./3EMA_SRSI_ATR.cpp -L./talib/talib_install/lib -lta_lib -lpthread -o ./3EMA_SRSI_ATR.exe 
