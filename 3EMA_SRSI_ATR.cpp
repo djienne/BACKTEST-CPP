@@ -303,21 +303,39 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         print_best_res(best);
     }
 
-    result.WALLET_VAL_USDT = USDT_amount;
-    result.gain_over_DDC = gain / DDC;
-    result.gain_pc = gain;
-    result.max_DD = max_drawdown;
-    result.nb_posi_entered = NB_POSI_ENTERED;
-    result.win_rate = WR;
-    result.score = score;
-    result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
-    result.ema1 = ema1;
-    result.ema2 = ema2;
-    result.ema3 = ema3;
-    result.up = up;
-    result.down = down;
-    result.total_fees_paid = total_fees_paid_USDT;
-    result.max_open_trades = MAX_OPEN_TRADES;
+    if (gain>0.0) {
+        result.WALLET_VAL_USDT = USDT_amount;
+        result.gain_over_DDC = gain / DDC;
+        result.gain_pc = gain;
+        result.max_DD = max_drawdown;
+        result.nb_posi_entered = NB_POSI_ENTERED;
+        result.win_rate = WR;
+        result.score = score;
+        result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
+        result.ema1 = ema1;
+        result.ema2 = ema2;
+        result.ema3 = ema3;
+        result.up = up;
+        result.down = down;
+        result.total_fees_paid = total_fees_paid_USDT;
+        result.max_open_trades = MAX_OPEN_TRADES;
+    } else {
+        result.WALLET_VAL_USDT = 0.0;
+        result.gain_over_DDC = 0.0;
+        result.gain_pc = 0.0;
+        result.max_DD = -100;
+        result.nb_posi_entered = 0;
+        result.win_rate = 0;
+        result.score = 0;
+        result.calmar_ratio = 0;
+        result.ema1 = ema1;
+        result.ema2 = ema2;
+        result.ema3 = ema3;
+        result.up = up;
+        result.down = down;
+        result.total_fees_paid = 0;
+        result.max_open_trades = MAX_OPEN_TRADES;
+    }
 
     return result;
 }
