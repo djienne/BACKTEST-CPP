@@ -209,7 +209,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                                 && StochRSI_K[ic][ii-1] > StochRSI_D[ic][ii-1] && StochRSI_K[ic][ii] <= StochRSI_D[ic][ii];
 
             CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
-                                || PAIRS[ic].close[ii] < price_position_open[ic] + down*ATR_AT_OPEN[ic];
+                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic];
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
