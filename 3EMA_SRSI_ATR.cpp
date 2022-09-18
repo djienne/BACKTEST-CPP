@@ -131,7 +131,7 @@ bool key_exists(std::unordered_map<string, vector<float>> m, const string &ch)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2, int ema3, float up, float down, const uint MAX_OPEN_TRADES)
+RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2, int ema3, const float up, const float down, const uint MAX_OPEN_TRADES)
 {
     nb_tested++;
 
