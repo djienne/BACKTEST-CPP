@@ -15,7 +15,7 @@ using uint = unsigned int;
 
 const string STRAT_NAME = "EMA3_SRSI_ATR";
 
-const vector<uint> MAX_OPEN_TRADES_TO_TEST{9, 10, 11};
+const vector<uint> MAX_OPEN_TRADES_TO_TEST{8, 9, 10, 11};
 const vector<string> COINS = {"BTC",
                               "ETH",
                               "BNB",
@@ -65,8 +65,8 @@ uint start_indexes[NB_PAIRS];
 vector<int> range_EMA1 = integer_range(2, 62, 2);
 vector<int> range_EMA2 = integer_range(2, 155, 5);
 vector<int> range_EMA3 = integer_range(25, 350, 10);
-vector<float> range_UP{3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-vector<float> range_DOWN{3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+vector<float> range_UP{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
+vector<float> range_DOWN{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
 //////////////////////////
 array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
 array<vector<float>, NB_PAIRS> StochRSI_K{};
@@ -219,6 +219,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                 const float to_add = COIN_AMOUNTS[ic] * PAIRS[ic].close[ii];
                 USDT_amount += to_add;
                 COIN_AMOUNTS[ic] = 0.0f;
+                ATR_AT_OPEN[ic] = 0.0f;
 
                 ACTIVE_POSITIONS--;
 
@@ -295,9 +296,10 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     if (i_print == 100)
     {
         i_print = 0;
-        std::cout << "DONE: Fast - Slow : " << ema1 << " - " << ema2 << endl;
-        std::cout << "NB tested = " << nb_tested << "/" << range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size() << endl;
-        std::cout << "Done " << std::round(float(nb_tested) / float(range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size()) * 100.0f * 100.0f ) / 100.0f << " %" << endl;
+        std::cout << "DONE: EMAs : " << ema1 << " - " << ema2 << " - " << ema3 << endl;
+        const int nb_total = range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size()* range_UP.size()* range_DOWN.size();
+        std::cout << "NB tested = " << nb_tested << "/" << nb_total << endl;
+        std::cout << "Done " << std::round(float(nb_tested) / float(nb_total) * 100.0f * 100.0f) / 100.0f << " %" << endl;
         print_best_res(best);
     }
 
@@ -389,7 +391,7 @@ KLINEf read_input_data(const string &input_file_path)
     kline.nb = int(kline.close.size());
 
     std::cout << "Loaded data file. " << input_file_path << endl;
-    
+
     return kline;
 }
 
