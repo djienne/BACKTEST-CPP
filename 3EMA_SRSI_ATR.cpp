@@ -293,7 +293,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     const float score = gain / DDC * WR;
 
     i_print++;
-    if (i_print == 100)
+    if (i_print == 10)
     {
         i_print = 0;
         std::cout << "DONE: EMAs : " << ema1 << " - " << ema2 << " - " << ema3 << endl;
