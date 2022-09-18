@@ -540,7 +540,7 @@ int main()
 
     // MAIN LOOP
     std::vector<EMA3_params> param_list{};
-    param_list.reserve(range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size());
+    param_list.reserve(range_EMA1.size() * range_EMA2.size() * range_EMA3.size() * range_UP.size() * range_DOWN.size() * MAX_OPEN_TRADES_TO_TEST.size());
 
     for (const uint max_op_tr : MAX_OPEN_TRADES_TO_TEST)
     {
