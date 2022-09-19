@@ -288,9 +288,12 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                                 && StochRSI_K[ic][ii-1] > StochRSI_D[ic][ii-1] && StochRSI_K[ic][ii] <= StochRSI_D[ic][ii];
             
             bool timeout = false;
+            bool hard_TP_condition = false;
             if (COIN_AMOUNTS[ic] != 0.0f)
             {
                 timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2 * 24 * 3600;
+                const float pc_gain = (PAIRS[ic].close[ii] - price_position_open[ic]) / price_position_open[ic] * 100.0f;
+                hard_TP_condition = pc_gain > 50.0f;
             }
             else
             {
@@ -299,7 +302,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
                                 || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] 
-                                || timeout;
+                                || timeout || hard_TP_condition;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
