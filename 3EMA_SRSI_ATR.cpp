@@ -235,6 +235,8 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     array<float, NB_PAIRS> stop_loss{};
     array<float, NB_PAIRS> stop_loss_at_open{};
     array<float, NB_PAIRS> ATR_AT_OPEN{};
+    array<uint, NB_PAIRS> OPEN_TS{};
+    
     array<vector<float>, NB_PAIRS> AO{};
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
@@ -265,8 +267,15 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                                 && StochRSI_K[ic][ii] < STOCH_RSI_LOWER && StochRSI_D[ic][ii] < STOCH_RSI_LOWER
                                 && StochRSI_K[ic][ii-1] > StochRSI_D[ic][ii-1] && StochRSI_K[ic][ii] <= StochRSI_D[ic][ii];
 
+	    bool timeout = false;
+            if (COIN_AMOUNTS[ic]!=0.0f) {
+                timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2*24*3600;
+            } else {
+                timeout = false;
+            }
+            
             CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
-                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic];
+                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] || timeout;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
@@ -277,6 +286,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                 USDT_amount += to_add;
                 COIN_AMOUNTS[ic] = 0.0f;
                 ATR_AT_OPEN[ic] = 0.0f;
+                OPEN_TS[ic] = -10;
 
                 ACTIVE_POSITIONS--;
 
@@ -306,6 +316,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                 COIN_AMOUNTS[ic] = USDT_amount * usdMultiplier / PAIRS[ic].close[ii];
                 USDT_amount -= USDT_amount * usdMultiplier;
                 ATR_AT_OPEN[ic] = ATR[ic][ii];
+                OPEN_TS[ic] = PAIRS[ic].timestamp[ii];
 
                 // apply FEEs
                 const float fe = COIN_AMOUNTS[ic] * FEE / 100.0f;
@@ -368,7 +379,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.nb_posi_entered = NB_POSI_ENTERED;
         result.win_rate = WR;
         result.score = score;
-        result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
+        result.calmar_ratio = calculate_calmar_ratio_monthly(USDT_tracking_ts, USDT_tracking, DDC);
         result.ema1 = ema1;
         result.ema2 = ema2;
         result.ema3 = ema3;

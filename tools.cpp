@@ -413,6 +413,54 @@ float calculate_calmar_ratio(const std::vector<int> &times, const std::vector<fl
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+float calculate_calmar_ratio_monthly(const std::vector<int> &times, const std::vector<float> &wallet_vals, const float &max_DD)
+{
+
+    if (times.size() <= 4)
+        return -100.0;
+
+    const uint last_idx = times.size() - 1;
+    const int first_year = get_year_from_timestamp(times[0]);
+    const int first_month = get_month_from_timestamp(times[0]);
+    const int first_day = get_day_from_timestamp(times[0]);
+    const int last_year = get_year_from_timestamp(times[last_idx]);
+    const int last_month = get_month_from_timestamp(times[last_idx]);
+    const int last_day = get_day_from_timestamp(times[last_idx]);
+
+    const float factor_first_month = (12.0f - float(first_month) - float(first_day) / 30.0f) / 12.0f;
+    const float factor_last_month = (float(last_month) + float(last_day) / 30.0f) / 12.0f;
+
+    std::vector<float> vals_begin_months{};
+    vals_begin_months.reserve(50);
+
+    vals_begin_months.push_back(1000.0);
+
+    for (uint ii = 1; ii < times.size(); ii++)
+    {
+        const int month_b = get_month_from_timestamp(times[ii - 1]);
+        const int month = get_month_from_timestamp(times[ii]);
+
+        if (month_b != month || ii == times.size() - 1)
+        {
+            vals_begin_months.push_back(wallet_vals[ii]);
+        }
+    }
+
+    std::vector<float> monthly_pc_changes{};
+    monthly_pc_changes.reserve(10);
+    for (uint iy = 1; iy < vals_begin_months.size(); iy++)
+    {
+        monthly_pc_changes.push_back((vals_begin_months[iy] - vals_begin_months[iy - 1]) / vals_begin_months[iy - 1] * 100.0f);
+    }
+
+    monthly_pc_changes[0] = monthly_pc_changes[0] * factor_first_month;
+    monthly_pc_changes[monthly_pc_changes.size() - 1] = monthly_pc_changes[monthly_pc_changes.size() - 1] * factor_last_month;
+
+    return find_average(monthly_pc_changes) / max_DD * 12.0;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void random_shuffle_vector(std::vector<float> &vec_in)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -457,7 +505,7 @@ void random_shuffle_vector_params(std::vector<EMA3_params> &vec_in)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<std::vector<EMA3_params>> SplitVector(const std::vector<EMA3_params>& vec, const int n)
+std::vector<std::vector<EMA3_params>> SplitVector(const std::vector<EMA3_params> &vec, const int n)
 {
     std::vector<std::vector<EMA3_params>> outVec;
 
