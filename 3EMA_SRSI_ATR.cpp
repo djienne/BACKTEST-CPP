@@ -257,7 +257,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         if (ii == nb_max - 1)
             LAST_ITERATION = true;
 
-        const int month_b = get_month_from_timestamp(PAIRS[0].timestamp[ii]);
+        const int month_b = get_month_from_timestamp(PAIRS[0].timestamp[ii-1]);
         const int month = get_month_from_timestamp(PAIRS[0].timestamp[ii]);
 
         if (month_b != month)
