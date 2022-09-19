@@ -176,6 +176,26 @@ float vector_product(const std::array<float, 20> &vec2, const std::array<float, 
     return out;
 }
 
+float vector_product(const std::array<float, 33> &vec2, const std::array<float, 33> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
+float vector_product(const std::array<float, 34> &vec2, const std::array<float, 34> &vec)
+{
+    float out = 0.0;
+    for (uint i = 0; i < vec2.size(); i++)
+    {
+        out += vec[i] * vec2[i];
+    }
+    return out;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float find_max(const std::vector<float> &vec)

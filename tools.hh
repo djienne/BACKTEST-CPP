@@ -95,6 +95,8 @@ float vector_product(const std::array<float, 19> &vec2, const std::array<float, 
 float vector_product(const std::array<float, 20> &vec2, const std::array<float, 20> &vec);
 float vector_product(const std::array<float, 21> &vec2, const std::array<float, 21> &vec);
 float vector_product(const std::array<float, 30> &vec2, const std::array<float, 30> &vec);
+float vector_product(const std::array<float, 33> &vec2, const std::array<float, 33> &vec);
+float vector_product(const std::array<float, 34> &vec2, const std::array<float, 34> &vec);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float find_average(const std::vector<float> &vec);
