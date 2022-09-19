@@ -97,56 +97,59 @@ void fill_datafile_paths()
 bool read_best(const RUN_RESULTf &bestt)
 {
 
-  int ema1,ema2,ema3,max_open_trades;
-  float calmar_ratio, up, down;
-  
-  std::ifstream in("best_result.txt", std::ios::in); // input
+    int ema1, ema2, ema3, max_open_trades;
+    float calmar_ratio, up, down;
 
-  if(!in) {
-    std::cout << "Cannot open test.txt file." << std::endl;;
-    return false;
-  }
-  
-  in >> calmar_ratio >> ema1 >>  ema1 >> ema3 >> up >> down >> max_open_trades;
-  
-  std::cout << "Global best: " << calmar_ratio << std::endl;
-  std::cout << "Local best : " << bestt.calmar_ratio << std::endl;
-  
-  in.close();
-  
-  if ((bestt.calmar_ratio - calmar_ratio)/bestt.calmar_ratio*100.0>0.1) 
-  { 
-  	return true;
-  } else 
-  {
-  	return false;
-  }
+    std::ifstream in("best_result.txt", std::ios::in); // input
 
+    if (!in)
+    {
+        std::cout << "Cannot open test.txt file." << std::endl;
+        ;
+        return false;
+    }
+
+    in >> calmar_ratio >> ema1 >> ema1 >> ema3 >> up >> down >> max_open_trades;
+
+    std::cout << "Global best: " << calmar_ratio << std::endl;
+    std::cout << "Local best : " << bestt.calmar_ratio << std::endl;
+
+    in.close();
+
+    if ((bestt.calmar_ratio - calmar_ratio) / bestt.calmar_ratio * 100.0 > 0.1)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void write_best_to_file(const RUN_RESULTf &bestt)
 {
 
-  if (read_best(bestt)) {
-	  ofstream out("best_result.txt", std::ios::trunc);
-	  if (out.is_open())
-	  {
-	    out     << bestt.calmar_ratio 
-		    << " " << bestt.ema1 
-		    << " " << bestt.ema2 
-		    << " " << bestt.ema3 
-		    << " " << bestt.up 
-		    << " " << bestt.down 
-		    << " " << bestt.max_open_trades 
-		    << std::endl;
-	    out.close();
-	  }
-	  else 
-	  {
-	    cout << "Unable to open file";
-	  }
-  }
+    if (read_best(bestt))
+    {
+        ofstream out("best_result.txt", std::ios::trunc);
+        if (out.is_open())
+        {
+            out << bestt.calmar_ratio
+                << " " << bestt.ema1
+                << " " << bestt.ema2
+                << " " << bestt.ema3
+                << " " << bestt.up
+                << " " << bestt.down
+                << " " << bestt.max_open_trades
+                << std::endl;
+            out.close();
+        }
+        else
+        {
+            cout << "Unable to open file";
+        }
+    }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -236,7 +239,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     array<float, NB_PAIRS> stop_loss_at_open{};
     array<float, NB_PAIRS> ATR_AT_OPEN{};
     array<uint, NB_PAIRS> OPEN_TS{};
-    
+
     array<vector<float>, NB_PAIRS> AO{};
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
@@ -247,10 +250,24 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
     const uint ii_begin = start_indexes[0];
 
+    bool NEW_MONTH = false;
+
     for (uint ii = ii_begin + 1; ii < nb_max; ii++)
     {
         if (ii == nb_max - 1)
             LAST_ITERATION = true;
+
+        const int month_b = get_month_from_timestamp(PAIRS[0].timestamp[ii]);
+        const int month = get_month_from_timestamp(PAIRS[0].timestamp[ii]);
+
+        if (month_b != month)
+        {
+            NEW_MONTH = true;
+        }
+        else
+        {
+            NEW_MONTH = false;
+        }
 
         bool closed = false;
         // For all pairs, check to close / open positions
@@ -266,16 +283,20 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                                 && PAIRS[ic].close[ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] 
                                 && StochRSI_K[ic][ii] < STOCH_RSI_LOWER && StochRSI_D[ic][ii] < STOCH_RSI_LOWER
                                 && StochRSI_K[ic][ii-1] > StochRSI_D[ic][ii-1] && StochRSI_K[ic][ii] <= StochRSI_D[ic][ii];
-
-	    bool timeout = false;
-            if (COIN_AMOUNTS[ic]!=0.0f) {
-                timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2*24*3600;
-            } else {
+            
+            bool timeout = false;
+            if (COIN_AMOUNTS[ic] != 0.0f)
+            {
+                timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2 * 24 * 3600;
+            }
+            else
+            {
                 timeout = false;
             }
-            
+
             CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
-                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] || timeout;
+                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] 
+                                || timeout;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
@@ -330,7 +351,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         }
 
         // check wallet status
-        if (closed || LAST_ITERATION)
+        if (closed || LAST_ITERATION || NEW_MONTH)
         {
             array<float, NB_PAIRS> closes{};
             for (uint ic = 0; ic < NB_PAIRS; ic++)
@@ -365,13 +386,14 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     {
         i_print = 0;
         std::cout << "DONE: EMAs : " << ema1 << " - " << ema2 << " - " << ema3 << endl;
-        const int nb_total = range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size()* range_UP.size()* range_DOWN.size();
+        const int nb_total = range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size() * range_UP.size() * range_DOWN.size();
         std::cout << "NB tested = " << nb_tested << "/" << nb_total << endl;
         std::cout << "Done " << std::round(float(nb_tested) / float(nb_total) * 100.0f * 100.0f) / 100.0f << " %" << endl;
         print_best_res(best);
     }
 
-    if (gain>0.0) {
+    if (gain > 0.0)
+    {
         result.WALLET_VAL_USDT = USDT_amount;
         result.gain_over_DDC = gain / DDC;
         result.gain_pc = gain;
@@ -387,7 +409,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.down = down;
         result.total_fees_paid = total_fees_paid_USDT;
         result.max_open_trades = MAX_OPEN_TRADES;
-    } else {
+    }
+    else
+    {
         result.WALLET_VAL_USDT = 0.0;
         result.gain_over_DDC = 0.0;
         result.gain_pc = 0.0;
@@ -459,7 +483,7 @@ KLINEf read_input_data(const string &input_file_path)
         while (last_times[super_index] != last_times[super_index - 1])
         {
             cout << "warning: inconsistent last times between different pairs, fixing it." << endl;
-            
+
             kline.timestamp.pop_back();
             kline.open.pop_back();
             kline.high.pop_back();
@@ -556,7 +580,7 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
 
     for (uint ic = 0; ic < NB_PAIRS; ic++)
     {
-        ATR[ic] = TALIB_ATR(PAIRS[ic].high,PAIRS[ic].low,PAIRS[ic].close, 14);
+        ATR[ic] = TALIB_ATR(PAIRS[ic].high, PAIRS[ic].low, PAIRS[ic].close, 14);
     }
     cout << "Calculated ATR." << endl;
 }
@@ -654,7 +678,7 @@ int main()
     std::cout << "Running all backtests..." << std::endl;
 
     random_shuffle_vector_params(param_list);
-    
+
     // std::vector<std::vector<EMA3_params>> SplitedVector = SplitVector(param_list, NB_THREADS);
 
     for (const auto para : param_list)
