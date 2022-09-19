@@ -109,8 +109,8 @@ bool read_best(const RUN_RESULTf &bestt)
   
   in >> calmar_ratio >> ema1 >>  ema1 >> ema3 >> up >> down >> max_open_trades;
   
-  std::cout << calmar_ratio << std::endl;
-  std::cout << bestt.calmar_ratio << std::endl;
+  std::cout << "Global best: " << calmar_ratio << std::endl;
+  std::cout << "Local best : " << bestt.calmar_ratio << std::endl;
   
   in.close();
   
