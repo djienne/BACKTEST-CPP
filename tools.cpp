@@ -454,3 +454,29 @@ void random_shuffle_vector_params(std::vector<EMA3_params> &vec_in)
     std::default_random_engine e(seed);
     std::shuffle(vec_in.begin(), vec_in.end(), e);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<std::vector<EMA3_params>> SplitVector(const std::vector<EMA3_params>& vec, const int n)
+{
+    std::vector<std::vector<EMA3_params>> outVec;
+
+    int length = vec.size() / n;
+    int remain = vec.size() % n;
+
+    int begin = 0;
+    int end = 0;
+
+    for (int i = 0; i < std::min(int(n), int(vec.size())); ++i)
+    {
+        end += (remain > 0) ? (length + !!(remain--)) : length;
+
+        outVec.push_back(std::vector<EMA3_params>(vec.begin() + begin, vec.begin() + end));
+
+        begin = end;
+    }
+
+    return outVec;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

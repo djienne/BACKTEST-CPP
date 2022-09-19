@@ -15,7 +15,7 @@ using uint = unsigned int;
 
 const string STRAT_NAME = "EMA3_SRSI_ATR";
 
-const vector<uint> MAX_OPEN_TRADES_TO_TEST{8, 9, 10, 11};
+const vector<uint> MAX_OPEN_TRADES_TO_TEST{7, 8, 9, 10, 11, 12};
 const vector<string> COINS = {"BTC",
                               "ETH",
                               "BNB",
@@ -47,6 +47,7 @@ const vector<string> COINS = {"BTC",
                               "FTM",
                               "ETC"};
 static const uint NB_PAIRS = 30;
+static const int NB_THREADS = 4;
 string timeframe = "5m";
 vector<string> DATAFILES{};
 
@@ -93,6 +94,61 @@ void fill_datafile_paths()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool read_best(const RUN_RESULTf &bestt)
+{
+
+  int ema1,ema2,ema3,max_open_trades;
+  float calmar_ratio, up, down;
+  
+  std::ifstream in("best_result.txt", std::ios::in); // input
+
+  if(!in) {
+    std::cout << "Cannot open test.txt file." << std::endl;;
+    return false;
+  }
+  
+  in >> calmar_ratio >> ema1 >>  ema1 >> ema3 >> up >> down >> max_open_trades;
+  
+  std::cout << calmar_ratio << std::endl;
+  std::cout << bestt.calmar_ratio << std::endl;
+  
+  in.close();
+  
+  if ((bestt.calmar_ratio - calmar_ratio)/bestt.calmar_ratio*100.0>0.1) 
+  { 
+  	return true;
+  } else 
+  {
+  	return false;
+  }
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void write_best_to_file(const RUN_RESULTf &bestt)
+{
+
+  if (read_best(bestt)) {
+	  ofstream out("best_result.txt", std::ios::trunc);
+	  if (out.is_open())
+	  {
+	    out     << bestt.calmar_ratio 
+		    << " " << bestt.ema1 
+		    << " " << bestt.ema2 
+		    << " " << bestt.ema3 
+		    << " " << bestt.up 
+		    << " " << bestt.down 
+		    << " " << bestt.max_open_trades 
+		    << std::endl;
+	    out.close();
+	  }
+	  else 
+	  {
+	    cout << "Unable to open file";
+	  }
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void print_best_res(const RUN_RESULTf &bestt)
 {
@@ -113,6 +169,7 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "Number of trades: " << bestt.nb_posi_entered << endl;
     std::cout << "Total fees paid: " << round(bestt.total_fees_paid * 100.0f) / 100.0f << "$ (started with 1000$)" << endl;
     std::cout << "-------------------------------------" << endl;
+    write_best_to_file(bestt);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,6 +643,8 @@ int main()
     std::cout << "Running all backtests..." << std::endl;
 
     random_shuffle_vector_params(param_list);
+    
+    // std::vector<std::vector<EMA3_params>> SplitedVector = SplitVector(param_list, NB_THREADS);
 
     for (const auto para : param_list)
     {
