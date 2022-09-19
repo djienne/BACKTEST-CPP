@@ -464,7 +464,7 @@ KLINEf read_input_data(const string &input_file_path)
         kline.timestamp.push_back(ts / 1000);
         if (previous_ts == ts)
         {
-            std::cout << "FOUND DUPLICATE TS at index " << nb_read << "; INGNORING. " << std::endl;
+            std::cout << "FOUND DUPLICATE TS at index " << nb_read << "; IGNORING. " << std::endl;
             previous_ts = ts / 1000;
             continue;
         }
