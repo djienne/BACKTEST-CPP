@@ -170,7 +170,7 @@ pair_list = ["BTC",
     "EOS",
     "AAVE",
     "FTM",
-    "ETC"];
+    "ETC","BCH","CHZ","FLOW"];
 
 for (let i = 0; i < pair_list.length; i++) {
     pair_list[i] = pair_list[i].concat("/USDT")

@@ -45,8 +45,11 @@ const vector<string> COINS = {"BTC",
                               "EOS",
                               "AAVE",
                               "FTM",
-                              "ETC"};
-static const uint NB_PAIRS = 30;
+                              "ETC",
+                              "BCH",
+                              "FLOW",
+                              "CHZ"};
+static const uint NB_PAIRS = 33;
 static const int NB_THREADS = 4;
 string timeframe = "5m";
 vector<string> DATAFILES{};
