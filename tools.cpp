@@ -427,8 +427,8 @@ float calculate_calmar_ratio_monthly(const std::vector<int> &times, const std::v
     const int last_month = get_month_from_timestamp(times[last_idx]);
     const int last_day = get_day_from_timestamp(times[last_idx]);
 
-    const float factor_first_month = (12.0f - float(first_month) - float(first_day) / 30.0f) / 12.0f;
-    const float factor_last_month = (float(last_month) + float(last_day) / 30.0f) / 12.0f;
+    const float factor_first_month = (12.0f - float(first_day) / 30.0f) / 12.0f;
+    const float factor_last_month = (float(last_day) / 30.0f) / 12.0f;
 
     std::vector<float> vals_begin_months{};
     vals_begin_months.reserve(50);
