@@ -63,7 +63,7 @@ uint start_indexes[NB_PAIRS];
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
 vector<int> range_EMA1 = integer_range(2, 62, 2);
-vector<int> range_EMA2 = integer_range(2, 155, 5);
+vector<int> range_EMA2 = integer_range(2, 200, 5);
 vector<int> range_EMA3 = integer_range(25, 350, 10);
 vector<float> range_UP{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
 vector<float> range_DOWN{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
