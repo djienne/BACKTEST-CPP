@@ -58,7 +58,7 @@ const float start_year = 2017; // forced year to start (applies if data below is
 const float FEE = 0.03f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
 const uint MIN_NUMBER_OF_TRADES = 1000;         // minimum number of trades required (to avoid some noise / lucky circunstances)
-const float MIN_ALLOWED_MAX_DRAWBACK = -37.0f; // %
+const float MIN_ALLOWED_MAX_DRAWBACK = -57.0f; // %
 const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
 uint start_indexes[NB_PAIRS];
