@@ -101,7 +101,7 @@ bool read_best(const RUN_RESULTf &bestt)
 {
 
     int ema1, ema2, ema3, max_open_trades;
-    float calmar_ratio, up, down;
+    float calmar_ratio_monthly, up, down;
 
     std::ifstream in("best_result.txt", std::ios::in); // input
 
@@ -112,14 +112,15 @@ bool read_best(const RUN_RESULTf &bestt)
         return false;
     }
 
-    in >> calmar_ratio >> ema1 >> ema1 >> ema3 >> up >> down >> max_open_trades;
+    in >> calmar_ratio_monthly >> ema1 >> ema1 >> ema3 >> up >> down >> max_open_trades;
 
-    std::cout << "Global best: " << calmar_ratio << std::endl;
-    std::cout << "Local best : " << bestt.calmar_ratio << std::endl;
+    std::cout << "Global best: " << calmar_ratio_monthly << std::endl;
+    std::cout << "Local best : " << bestt.calmar_ratio_monthly << std::endl;
+    std::cout << "(yearly : " << bestt.calmar_ratio << ")" << std::endl;
 
     in.close();
 
-    if ((bestt.calmar_ratio - calmar_ratio) / bestt.calmar_ratio * 100.0 > 0.1)
+    if ((bestt.calmar_ratio_monthly - calmar_ratio_monthly) / bestt.calmar_ratio_monthly * 100.0 > 0.1)
     {
         return true;
     }
@@ -407,7 +408,8 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.nb_posi_entered = NB_POSI_ENTERED;
         result.win_rate = WR;
         result.score = score;
-        result.calmar_ratio = calculate_calmar_ratio_monthly(USDT_tracking_ts, USDT_tracking, DDC);
+        result.calmar_ratio_monthly = calculate_calmar_ratio_monthly(USDT_tracking_ts, USDT_tracking, DDC);
+        result.calmar_ratio = calculate_calmar_ratio(USDT_tracking_ts, USDT_tracking, DDC);
         result.ema1 = ema1;
         result.ema2 = ema2;
         result.ema3 = ema3;
@@ -425,6 +427,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.nb_posi_entered = 0;
         result.win_rate = 0;
         result.score = 0;
+        result.calmar_ratio_monthly = 0;
         result.calmar_ratio = 0;
         result.ema1 = ema1;
         result.ema2 = ema2;
@@ -693,7 +696,7 @@ int main()
     {
         const RUN_RESULTf res = PROCESS(PAIRS, para.ema1, para.ema2, para.ema3, para.up, para.down, para.max_open_trades);
 
-        if (res.calmar_ratio > best.calmar_ratio && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+        if (res.calmar_ratio > best.calmar_ratio && res.gain_pc > 800.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
         {
             best = res;
         }

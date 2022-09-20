@@ -41,6 +41,7 @@ struct RUN_RESULTf
     float total_fees_paid;
     int max_delta_t_new_ATH;
     float calmar_ratio;
+    float calmar_ratio_monthly;
     uint max_open_trades;
 };
 
