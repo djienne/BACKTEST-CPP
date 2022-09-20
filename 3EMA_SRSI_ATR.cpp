@@ -139,7 +139,7 @@ void write_best_to_file(const RUN_RESULTf &bestt)
         ofstream out("best_result.txt", std::ios::trunc);
         if (out.is_open())
         {
-            out << bestt.calmar_ratio
+            out << bestt.calmar_ratio_monthly
                 << " " << bestt.ema1
                 << " " << bestt.ema2
                 << " " << bestt.ema3
@@ -172,7 +172,7 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "max DD   : " << bestt.max_DD << "%" << endl;
     std::cout << "Gain/DDC : " << bestt.gain_over_DDC << endl;
     std::cout << "Score    : " << bestt.score << endl;
-    std::cout << "Calmar ratio monthly: " << bestt.calmar_ratio << endl;
+    std::cout << "Calmar ratio monthly: " << bestt.calmar_ratio_monthly << endl;
     std::cout << "Number of trades: " << bestt.nb_posi_entered << endl;
     std::cout << "Total fees paid: " << round(bestt.total_fees_paid * 100.0f) / 100.0f << "$ (started with 1000$)" << endl;
     std::cout << "-------------------------------------" << endl;
