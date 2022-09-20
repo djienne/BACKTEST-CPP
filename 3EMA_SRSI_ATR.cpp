@@ -57,7 +57,7 @@ vector<string> DATAFILES{};
 const float start_year = 2017; // forced year to start (applies if data below is available)
 const float FEE = 0.03f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
-const uint MIN_NUMBER_OF_TRADES = 100;         // minimum number of trades required (to avoid some noise / lucky circunstances)
+const uint MIN_NUMBER_OF_TRADES = 1000;         // minimum number of trades required (to avoid some noise / lucky circunstances)
 const float MIN_ALLOWED_MAX_DRAWBACK = -37.0f; // %
 const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
@@ -671,6 +671,8 @@ int main()
                     {
                         for (const float down : range_DOWN)
                         {
+                            if (ema1>ema2) continue;
+                            if (ema2>ema3) continue;
                             const EMA3_params to_add{ema1, ema2, ema3, up, down, max_op_tr};
                             param_list.push_back(to_add);
                         }
