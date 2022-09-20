@@ -173,6 +173,7 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "Gain/DDC : " << bestt.gain_over_DDC << endl;
     std::cout << "Score    : " << bestt.score << endl;
     std::cout << "Calmar ratio monthly: " << bestt.calmar_ratio_monthly << endl;
+    std::cout << "Calmar ratio : " << bestt.calmar_ratio << endl;
     std::cout << "Number of trades: " << bestt.nb_posi_entered << endl;
     std::cout << "Total fees paid: " << round(bestt.total_fees_paid * 100.0f) / 100.0f << "$ (started with 1000$)" << endl;
     std::cout << "-------------------------------------" << endl;
@@ -633,6 +634,7 @@ int main()
 
     best.gain_over_DDC = -100.0f;
     best.calmar_ratio = -100.0f;
+    best.calmar_ratio_monthly = -100.0f;
 
     const uint last_idx = PAIRS[0].nb - 1;
 
@@ -696,7 +698,7 @@ int main()
     {
         const RUN_RESULTf res = PROCESS(PAIRS, para.ema1, para.ema2, para.ema3, para.up, para.down, para.max_open_trades);
 
-        if (res.calmar_ratio > best.calmar_ratio && res.gain_pc > 800.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+        if (res.calmar_ratio_monthly > best.calmar_ratio_monthly && res.gain_pc > 800.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
         {
             best = res;
         }
