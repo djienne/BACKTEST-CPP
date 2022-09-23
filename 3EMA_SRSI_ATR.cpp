@@ -244,13 +244,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     array<float, NB_PAIRS> stop_loss_at_open{};
     array<float, NB_PAIRS> ATR_AT_OPEN{};
     array<uint, NB_PAIRS> OPEN_TS{};
-
-    array<vector<float>, NB_PAIRS> AO{};
-    for (uint ic = 0; ic < NB_PAIRS; ic++)
-    {
-        COIN_AMOUNTS[ic] = 0.0f;
-        AO[ic] = TALIB_AO(PAIRS[ic].high, PAIRS[ic].low, ema1, ema2);
-    }
+    
     uint ACTIVE_POSITIONS = 0;
 
     const uint ii_begin = start_indexes[0];
