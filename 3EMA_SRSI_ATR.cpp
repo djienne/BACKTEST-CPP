@@ -72,10 +72,7 @@ vector<int> range_EMA3 = integer_range(25, 350, 10);
 vector<float> range_UP{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
 vector<float> range_DOWN{3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0};
 //////////////////////////
-array<std::unordered_map<string, vector<float>>, NB_PAIRS> EMA_LISTS{};
-array<vector<float>, NB_PAIRS> StochRSI_K{};
-array<vector<float>, NB_PAIRS> StochRSI_D{};
-array<vector<float>, NB_PAIRS> ATR{};
+array<std::unordered_map<string, vector<float>>, NB_PAIRS> INDICATORS{};
 
 array<long int, NB_PAIRS> last_times{};
 
@@ -182,7 +179,7 @@ void print_best_res(const RUN_RESULTf &bestt)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool key_exists(std::unordered_map<string, vector<float>> m, const string &ch)
+bool key_exists(const std::unordered_map<string, vector<float>> &m, const string &ch)
 {
     if (m.find(ch) != m.end())
     {
@@ -205,17 +202,29 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         const string k1 = "EMA_" + std::to_string(ema1);
         const string k2 = "EMA_" + std::to_string(ema2);
         const string k3 = "EMA_" + std::to_string(ema3);
-        if (!key_exists(EMA_LISTS[ic], k1))
+        if (!key_exists(INDICATORS[ic], k1))
         {
-            EMA_LISTS[ic][k1] = TALIB_EMA(PAIRS[ic].close, ema1);
+            INDICATORS[ic][k1] = TALIB_EMA(PAIRS[ic].close, ema1);
         }
-        if (!key_exists(EMA_LISTS[ic], k2))
+        if (!key_exists(INDICATORS[ic], k2))
         {
-            EMA_LISTS[ic][k2] = TALIB_EMA(PAIRS[ic].close, ema2);
+            INDICATORS[ic][k2] = TALIB_EMA(PAIRS[ic].close, ema2);
         }
-        if (!key_exists(EMA_LISTS[ic], k3))
+        if (!key_exists(INDICATORS[ic], k3))
         {
-            EMA_LISTS[ic][k3] = TALIB_EMA(PAIRS[ic].close, ema3);
+            INDICATORS[ic][k3] = TALIB_EMA(PAIRS[ic].close, ema3);
+        }
+        if (!key_exists(INDICATORS[ic], "StochRSI_K"))
+        {
+            INDICATORS[ic]["StochRSI_K"] = TALIB_STOCHRSI_K(PAIRS[ic].close, 14, 14, 3, 3);
+        }
+        if (!key_exists(INDICATORS[ic], "StochRSI_D"))
+        {
+            INDICATORS[ic]["StochRSI_D"] = TALIB_STOCHRSI_D(PAIRS[ic].close, 14, 14, 3, 3);
+        }
+        if (!key_exists(INDICATORS[ic], "ATR"))
+        {
+            INDICATORS[ic]["ATR"] = TALIB_ATR(PAIRS[ic].high, PAIRS[ic].low, PAIRS[ic].close, 14);
         }
     }
 
@@ -275,11 +284,11 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             // conditions for open / close position
 
-            bool OPEN_LONG_CONDI = EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema2)][ii] 
-                                && EMA_LISTS[ic]["EMA_" + std::to_string(ema2)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema3)][ii] 
-                                && PAIRS[ic].close[ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] 
-                                && StochRSI_K[ic][ii] < STOCH_RSI_LOWER && StochRSI_D[ic][ii] < STOCH_RSI_LOWER
-                                && StochRSI_K[ic][ii-1] > StochRSI_D[ic][ii-1] && StochRSI_K[ic][ii] <= StochRSI_D[ic][ii];
+            bool OPEN_LONG_CONDI = INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] 
+                                && INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema3)][ii] 
+                                && PAIRS[ic].close[ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] 
+                                && INDICATORS[ic]["StochRSI_K"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_D"][ii] < STOCH_RSI_LOWER
+                                && INDICATORS[ic]["StochRSI_K"][ii-1] > INDICATORS[ic]["StochRSI_D"][ii-1] && INDICATORS[ic]["StochRSI_K"][ii] <= INDICATORS[ic]["StochRSI_D"][ii];
             
             bool timeout = false;
             bool hard_TP_condition = false;
@@ -287,7 +296,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
             {
                 timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2 * 24 * 3600;
                 const float pc_gain = (PAIRS[ic].close[ii] - price_position_open[ic]) / price_position_open[ic] * 100.0f;
-                hard_TP_condition = pc_gain > 5.0f;
+                hard_TP_condition = pc_gain > 15.0f;
             }
             else
             {
@@ -336,7 +345,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
                 COIN_AMOUNTS[ic] = USDT_amount * usdMultiplier / PAIRS[ic].close[ii];
                 USDT_amount -= USDT_amount * usdMultiplier;
-                ATR_AT_OPEN[ic] = ATR[ic][ii];
+                ATR_AT_OPEN[ic] = INDICATORS[ic]["ATR"][ii];
                 OPEN_TS[ic] = PAIRS[ic].timestamp[ii];
 
                 // apply FEEs
@@ -570,20 +579,6 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
     }
     std::cout << "Done." << std::endl;
 
-    //
-
-    for (uint ic = 0; ic < NB_PAIRS; ic++)
-    {
-        StochRSI_K[ic] = TALIB_STOCHRSI_K(PAIRS[ic].close, 14, 14, 3, 3);
-        StochRSI_D[ic] = TALIB_STOCHRSI_D(PAIRS[ic].close, 14, 14, 3, 3);
-    }
-    cout << "Calculated STOCHRSI K and D." << endl;
-
-    for (uint ic = 0; ic < NB_PAIRS; ic++)
-    {
-        ATR[ic] = TALIB_ATR(PAIRS[ic].high, PAIRS[ic].low, PAIRS[ic].close, 14);
-    }
-    cout << "Calculated ATR." << endl;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
