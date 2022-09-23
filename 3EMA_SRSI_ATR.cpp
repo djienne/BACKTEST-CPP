@@ -363,8 +363,10 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         if (closed || LAST_ITERATION || NEW_MONTH)
         {
             array<float, NB_PAIRS> closes{};
-            for (uint ic = 0; ic < NB_PAIRS; ic++)
+            for (uint ic = 0; ic < NB_PAIRS; ic++) 
+            {
                 closes[ic] = PAIRS[ic].close[ii];
+            }
 
             WALLET_VAL_USDT = USDT_amount + vector_product(COIN_AMOUNTS, closes);
             if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT)
@@ -372,7 +374,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             pc_change_with_max = (WALLET_VAL_USDT - MAX_WALLET_VAL_USDT) / MAX_WALLET_VAL_USDT * 100.0f;
             if (pc_change_with_max < max_drawdown)
+            {
                 max_drawdown = pc_change_with_max;
+            }
 
             USDT_tracking.push_back(WALLET_VAL_USDT);
             USDT_tracking_ts.push_back(PAIRS[0].timestamp[ii]);
