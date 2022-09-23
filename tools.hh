@@ -38,6 +38,7 @@ struct RUN_RESULTf
     float gain_limit;
     float up;
     float down;
+    float SRSIL;
     float total_fees_paid;
     int max_delta_t_new_ATH;
     float calmar_ratio;
@@ -69,6 +70,7 @@ struct EMA3_params
     int ema3;
     float up;
     float down;
+    float SRSIL;
     uint max_open_trades;
 };
 

@@ -57,10 +57,9 @@ vector<string> DATAFILES{};
 const float start_year = 2017; // forced year to start (applies if data below is available)
 const float FEE = 0.03f;       // FEES in %
 const float USDT_amount_initial = 1000.0f;
-const uint MIN_NUMBER_OF_TRADES = 1000;         // minimum number of trades required (to avoid some noise / lucky circunstances)
+const uint MIN_NUMBER_OF_TRADES = 1000;        // minimum number of trades required (to avoid some noise / lucky circunstances)
 const float MIN_ALLOWED_MAX_DRAWBACK = -50.0f; // %
-const float STOCH_RSI_UPPER = 0.800f;
-const float STOCH_RSI_LOWER = 0.200f;
+vector<float> range_STOCH_RSI_LOWER = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f};
 uint start_indexes[NB_PAIRS];
 
 // RANGE OF PARAMETERS TO TEST
@@ -98,7 +97,7 @@ bool read_best(const RUN_RESULTf &bestt)
 {
 
     int ema1, ema2, ema3, max_open_trades;
-    float calmar_ratio_monthly, up, down;
+    float calmar_ratio_monthly, up, down, SRSIL;
 
     std::ifstream in("best_result.txt", std::ios::in); // input
 
@@ -109,7 +108,7 @@ bool read_best(const RUN_RESULTf &bestt)
         return false;
     }
 
-    in >> calmar_ratio_monthly >> ema1 >> ema1 >> ema3 >> up >> down >> max_open_trades;
+    in >> calmar_ratio_monthly >> ema1 >> ema1 >> ema3 >> up >> down >> SRSIL >> max_open_trades;
 
     std::cout << "Global best: " << calmar_ratio_monthly << std::endl;
     std::cout << "Local best : " << bestt.calmar_ratio_monthly << std::endl;
@@ -162,6 +161,7 @@ void print_best_res(const RUN_RESULTf &bestt)
     std::cout << "Strategy : " << STRAT_NAME << endl;
     std::cout << "EMAs : " << bestt.ema1 << " - " << bestt.ema2 << " - " << bestt.ema3 << endl;
     std::cout << "UP - DOWN : " << bestt.up << " - " << bestt.down << endl;
+    std::cout << "StochOversold : " << bestt.SRSIL << endl;
     std::cout << "Max Open Trades : " << bestt.max_open_trades << endl;
     std::cout << "Best Gain: " << bestt.gain_pc << "%" << endl;
     std::cout << "Porfolio : " << bestt.WALLET_VAL_USDT << "$ (started with 1000$)" << endl;
@@ -193,7 +193,7 @@ bool key_exists(const std::unordered_map<string, vector<float>> &m, const string
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2, int ema3, const float up, const float down, const uint MAX_OPEN_TRADES)
+RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2, int ema3, const float up, const float down, const float STOCH_RSI_LOWER, const uint MAX_OPEN_TRADES)
 {
     nb_tested++;
 
@@ -251,7 +251,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     array<float, NB_PAIRS> stop_loss_at_open{};
     array<float, NB_PAIRS> ATR_AT_OPEN{};
     array<uint, NB_PAIRS> OPEN_TS{};
-    
+
     uint ACTIVE_POSITIONS = 0;
 
     const uint ii_begin = start_indexes[0];
@@ -263,7 +263,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         if (ii == nb_max - 1)
             LAST_ITERATION = true;
 
-        const int month_b = get_month_from_timestamp(PAIRS[0].timestamp[ii-1]);
+        const int month_b = get_month_from_timestamp(PAIRS[0].timestamp[ii - 1]);
         const int month = get_month_from_timestamp(PAIRS[0].timestamp[ii]);
 
         if (month_b != month)
@@ -284,12 +284,8 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             // conditions for open / close position
 
-            bool OPEN_LONG_CONDI = INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] 
-                                && INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema3)][ii] 
-                                && PAIRS[ic].close[ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] 
-                                && INDICATORS[ic]["StochRSI_K"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_D"][ii] < STOCH_RSI_LOWER
-                                && INDICATORS[ic]["StochRSI_K"][ii-1] > INDICATORS[ic]["StochRSI_D"][ii-1] && INDICATORS[ic]["StochRSI_K"][ii] <= INDICATORS[ic]["StochRSI_D"][ii];
-            
+            bool OPEN_LONG_CONDI = INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] && INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema3)][ii] && PAIRS[ic].close[ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] && INDICATORS[ic]["StochRSI_K"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_D"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_K"][ii - 1] > INDICATORS[ic]["StochRSI_D"][ii - 1] && INDICATORS[ic]["StochRSI_K"][ii] <= INDICATORS[ic]["StochRSI_D"][ii];
+
             bool timeout = false;
             bool hard_TP_condition = false;
             if (COIN_AMOUNTS[ic] != 0.0f)
@@ -303,9 +299,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                 timeout = false;
             }
 
-            bool CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
-                                || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] 
-                                || timeout || hard_TP_condition;
+            bool CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up * ATR_AT_OPEN[ic] || PAIRS[ic].close[ii] < price_position_open[ic] - down * ATR_AT_OPEN[ic] || timeout || hard_TP_condition;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
@@ -363,13 +357,13 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         if (closed || LAST_ITERATION || NEW_MONTH)
         {
             array<float, NB_PAIRS> closes{};
-            for (uint ic = 0; ic < NB_PAIRS; ic++) 
+            for (uint ic = 0; ic < NB_PAIRS; ic++)
             {
                 closes[ic] = PAIRS[ic].close[ii];
             }
 
             WALLET_VAL_USDT = USDT_amount + vector_product(COIN_AMOUNTS, closes);
-            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT) 
+            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT)
             {
                 MAX_WALLET_VAL_USDT = WALLET_VAL_USDT;
             }
@@ -425,6 +419,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.ema3 = ema3;
         result.up = up;
         result.down = down;
+        result.SRSIL = STOCH_RSI_LOWER;
         result.total_fees_paid = total_fees_paid_USDT;
         result.max_open_trades = MAX_OPEN_TRADES;
     }
@@ -444,6 +439,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
         result.ema3 = ema3;
         result.up = up;
         result.down = down;
+        result.SRSIL = STOCH_RSI_LOWER;
         result.total_fees_paid = 0;
         result.max_open_trades = MAX_OPEN_TRADES;
     }
@@ -584,7 +580,6 @@ void INITIALIZE_DATA(vector<KLINEf> &PAIRS)
         }
     }
     std::cout << "Done." << std::endl;
-
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,7 +602,8 @@ int main()
     retCode = TA_Initialize();
     if (retCode != TA_SUCCESS)
     {
-        std::cout << "Cannot initialize TA-Lib !\n" << retCode << "\n";
+        std::cout << "Cannot initialize TA-Lib !\n"
+                  << retCode << "\n";
     }
     else
     {
@@ -646,8 +642,7 @@ int main()
     std::cout << "EMA1 max tested : " << find_max(range_EMA1) << endl;
     std::cout << "EMA2 max tested : " << find_max(range_EMA2) << endl;
     std::cout << "EMA3 max tested : " << find_max(range_EMA3) << endl;
-    std::cout << "StochRSI Upper Band   : " << STOCH_RSI_UPPER << endl;
-    std::cout << "StochRSI Lower Band   : " << STOCH_RSI_LOWER << endl;
+    std::cout << "StochRSI max tested   : " << find_max(range_STOCH_RSI_LOWER) << endl;
     std::cout << "-------------------------------------" << endl;
 
     // MAIN LOOP
@@ -666,10 +661,15 @@ int main()
                     {
                         for (const float down : range_DOWN)
                         {
-                            if (ema1>=ema2) continue;
-                            if (ema2>=ema3) continue;
-                            const EMA3_params to_add{ema1, ema2, ema3, up, down, max_op_tr};
-                            param_list.push_back(to_add);
+                            for (const float SRSIL : range_STOCH_RSI_LOWER)
+                            {
+                                if (ema1 >= ema2)
+                                    continue;
+                                if (ema2 >= ema3)
+                                    continue;
+                                const EMA3_params to_add{ema1, ema2, ema3, up, down, SRSIL, max_op_tr};
+                                param_list.push_back(to_add);
+                            }
                         }
                     }
                 }
@@ -686,7 +686,7 @@ int main()
 
     for (const auto para : param_list)
     {
-        const RUN_RESULTf res = PROCESS(PAIRS, para.ema1, para.ema2, para.ema3, para.up, para.down, para.max_open_trades);
+        const RUN_RESULTf res = PROCESS(PAIRS, para.ema1, para.ema2, para.ema3, para.up, para.down, para.SRSIL, para.max_open_trades);
 
         if (res.calmar_ratio_monthly > best.calmar_ratio_monthly && res.gain_pc > 800.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
         {
