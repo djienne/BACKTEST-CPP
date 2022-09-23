@@ -141,6 +141,7 @@ void write_best_to_file(const RUN_RESULTf &bestt)
                 << " " << bestt.ema3
                 << " " << bestt.up
                 << " " << bestt.down
+                << " " << bestt.SRSIL
                 << " " << bestt.max_open_trades
                 << std::endl;
             out.close();
