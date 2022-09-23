@@ -284,7 +284,13 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             // conditions for open / close position
 
-            bool OPEN_LONG_CONDI = INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] && INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema3)][ii] && PAIRS[ic].close[ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] && INDICATORS[ic]["StochRSI_K"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_D"][ii] < STOCH_RSI_LOWER && INDICATORS[ic]["StochRSI_K"][ii - 1] > INDICATORS[ic]["StochRSI_D"][ii - 1] && INDICATORS[ic]["StochRSI_K"][ii] <= INDICATORS[ic]["StochRSI_D"][ii];
+            bool OPEN_LONG_CONDI = INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] 
+                                    && INDICATORS[ic]["EMA_" + std::to_string(ema2)][ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema3)][ii] 
+                                    && PAIRS[ic].close[ii] >= INDICATORS[ic]["EMA_" + std::to_string(ema1)][ii] 
+                                    && INDICATORS[ic]["StochRSI_K"][ii] < STOCH_RSI_LOWER 
+                                    && INDICATORS[ic]["StochRSI_D"][ii] < STOCH_RSI_LOWER 
+                                    && INDICATORS[ic]["StochRSI_K"][ii - 1] > INDICATORS[ic]["StochRSI_D"][ii - 1] 
+                                    && INDICATORS[ic]["StochRSI_K"][ii] <= INDICATORS[ic]["StochRSI_D"][ii];
 
             bool timeout = false;
             bool hard_TP_condition = false;
@@ -299,7 +305,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
                 timeout = false;
             }
 
-            bool CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up * ATR_AT_OPEN[ic] || PAIRS[ic].close[ii] < price_position_open[ic] - down * ATR_AT_OPEN[ic] || timeout || hard_TP_condition;
+            bool CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up * ATR_AT_OPEN[ic] 
+                                    || PAIRS[ic].close[ii] < price_position_open[ic] - down * ATR_AT_OPEN[ic] 
+                                    || timeout || hard_TP_condition;
 
             // IT IS IMPORTANT TO CHECK FIRST FOR CLOSING POSITION AND ONLY THEN FOR OPENING POSITION
 
