@@ -688,7 +688,7 @@ int main()
     {
         const RUN_RESULTf res = PROCESS(PAIRS, para.ema1, para.ema2, para.ema3, para.up, para.down, para.SRSIL, para.max_open_trades);
 
-        if (res.calmar_ratio_monthly > best.calmar_ratio_monthly && res.gain_pc > 800.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
+        if (res.calmar_ratio_monthly > best.calmar_ratio_monthly && res.gain_pc > 500.0f && res.gain_pc < 1000000.0f && res.nb_posi_entered >= MIN_NUMBER_OF_TRADES && res.max_DD > MIN_ALLOWED_MAX_DRAWBACK)
         {
             best = res;
         }
