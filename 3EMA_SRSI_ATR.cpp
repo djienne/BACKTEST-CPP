@@ -607,8 +607,7 @@ int main()
     retCode = TA_Initialize();
     if (retCode != TA_SUCCESS)
     {
-        std::cout << "Cannot initialize TA-Lib !\n"
-                  << retCode << "\n";
+        std::cout << "Cannot initialize TA-Lib !\n" << retCode << "\n";
     }
     else
     {
