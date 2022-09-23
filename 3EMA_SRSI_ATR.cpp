@@ -63,7 +63,7 @@ const float STOCH_RSI_UPPER = 0.800f;
 const float STOCH_RSI_LOWER = 0.200f;
 uint start_indexes[NB_PAIRS];
 
-// RANGE OF PERIDOS TO TEST
+// RANGE OF PARAMETERS TO TEST
 // const int range_step = 2;
 // vector<int> range_EMA = {180};
 vector<int> range_EMA1 = integer_range(2, 62, 2);
@@ -227,8 +227,6 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     const uint nb_max = PAIRS[0].nb;
 
     bool LAST_ITERATION = false;
-    bool OPEN_LONG_CONDI = false;
-    bool CLOSE_LONG_CONDI = false;
     uint nb_profit = 0;
     uint nb_loss = 0;
     uint NB_POSI_ENTERED = 0;
@@ -277,7 +275,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
             // conditions for open / close position
 
-            OPEN_LONG_CONDI = EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema2)][ii] 
+            bool OPEN_LONG_CONDI = EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema2)][ii] 
                                 && EMA_LISTS[ic]["EMA_" + std::to_string(ema2)][ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema3)][ii] 
                                 && PAIRS[ic].close[ii] >= EMA_LISTS[ic]["EMA_" + std::to_string(ema1)][ii] 
                                 && StochRSI_K[ic][ii] < STOCH_RSI_LOWER && StochRSI_D[ic][ii] < STOCH_RSI_LOWER
@@ -289,14 +287,14 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
             {
                 timeout = (PAIRS[ic].timestamp[ii] - OPEN_TS[ic]) >= 2 * 24 * 3600;
                 const float pc_gain = (PAIRS[ic].close[ii] - price_position_open[ic]) / price_position_open[ic] * 100.0f;
-                hard_TP_condition = pc_gain > 50.0f;
+                hard_TP_condition = pc_gain > 5.0f;
             }
             else
             {
                 timeout = false;
             }
 
-            CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
+            bool CLOSE_LONG_CONDI = PAIRS[ic].close[ii] > price_position_open[ic] + up*ATR_AT_OPEN[ic] 
                                 || PAIRS[ic].close[ii] < price_position_open[ic] - down*ATR_AT_OPEN[ic] 
                                 || timeout || hard_TP_condition;
 
@@ -374,7 +372,9 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
 
     array<float, NB_PAIRS> last_closes{};
     for (uint ic = 0; ic < NB_PAIRS; ic++)
+    {
         last_closes[ic] = PAIRS[ic].close[nb_max - 1];
+    }
 
     WALLET_VAL_USDT = USDT_amount + vector_product(COIN_AMOUNTS, last_closes);
 
@@ -478,9 +478,6 @@ KLINEf read_input_data(const string &input_file_path)
     }
 
     last_times[super_index] = kline.timestamp.back();
-
-    // cout << last_times[super_index] << endl;
-    // cout << super_index << endl;
 
     if (super_index >= 1)
     {
@@ -644,7 +641,6 @@ int main()
     std::cout << "Begin day      : " << year << "/" << month << "/" << day << endl;
     std::cout << "End day        : " << last_year << "/" << last_month << "/" << last_day << endl;
     std::cout << "OPEN/CLOSE FEE : " << FEE << " %" << endl;
-    // std::cout << "Maximum number open trades: " << MAX_OPEN_TRADES << endl;
     std::cout << "Minimum number of trades required    : " << MIN_NUMBER_OF_TRADES << endl;
     std::cout << "Maximum drawback (=drawdown) allowed : " << MIN_ALLOWED_MAX_DRAWBACK << " %" << endl;
     std::cout << "EMA1 max tested : " << find_max(range_EMA1) << endl;
@@ -670,8 +666,8 @@ int main()
                     {
                         for (const float down : range_DOWN)
                         {
-                            if (ema1>ema2) continue;
-                            if (ema2>ema3) continue;
+                            if (ema1>=ema2) continue;
+                            if (ema2>=ema3) continue;
                             const EMA3_params to_add{ema1, ema2, ema3, up, down, max_op_tr};
                             param_list.push_back(to_add);
                         }
