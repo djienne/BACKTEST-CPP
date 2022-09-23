@@ -406,7 +406,7 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
     {
         i_print = 0;
         std::cout << "DONE: EMAs : " << ema1 << " - " << ema2 << " - " << ema3 << endl;
-        const int nb_total = range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size() * range_UP.size() * range_DOWN.size();
+        const int nb_total = range_EMA2.size() * range_EMA1.size() * MAX_OPEN_TRADES_TO_TEST.size() * range_EMA3.size() * range_UP.size() * range_DOWN.size() * range_STOCH_RSI_LOWER.size();
         std::cout << "NB tested = " << nb_tested << "/" << nb_total << endl;
         std::cout << "Done " << std::round(float(nb_tested) / float(nb_total) * 100.0f * 100.0f) / 100.0f << " %" << endl;
         print_best_res(best);
