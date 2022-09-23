@@ -369,8 +369,10 @@ RUN_RESULTf PROCESS(const vector<KLINEf> &PAIRS, const int ema1, const int ema2,
             }
 
             WALLET_VAL_USDT = USDT_amount + vector_product(COIN_AMOUNTS, closes);
-            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT)
+            if (WALLET_VAL_USDT > MAX_WALLET_VAL_USDT) 
+            {
                 MAX_WALLET_VAL_USDT = WALLET_VAL_USDT;
+            }
 
             pc_change_with_max = (WALLET_VAL_USDT - MAX_WALLET_VAL_USDT) / MAX_WALLET_VAL_USDT * 100.0f;
             if (pc_change_with_max < max_drawdown)
